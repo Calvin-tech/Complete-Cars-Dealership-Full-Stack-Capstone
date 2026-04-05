@@ -94,9 +94,9 @@ const Register = () => {
                     </div>
                     <div className="form-group mb-5">
                         <label htmlFor="password" className="small font-weight-bold text-muted text-uppercase">Password</label>
-                        <input type="password" id="password" className="form-control" placeholder="••••••••" style={{ height: '56px' }} value={formData.password} onChange={handleChange} required />
+                        <input type="password" id="password" className="form-control" placeholder="••••••••" style={{ height: '56px' }} value={formData.password} onChange={handleChange} required minLength="8" />
                     </div>
-                    <button type="submit" className="btn btn-primary btn-block py-3">Create account</button>
+                    <button type="submit" className="btn btn-primary btn-block py-3">Register</button>
                 </form>
 
                 {message.text && <div className={`mt-3 small font-weight-bold text-${message.type}`}>{message.text}</div>}
