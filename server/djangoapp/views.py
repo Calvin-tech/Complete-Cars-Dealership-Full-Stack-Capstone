@@ -17,11 +17,10 @@ logger = logging.getLogger(__name__)
 
 from django.views.decorators.csrf import csrf_exempt
 
-# Create a `logout_request` view to handle sign out parameter
-def logout_user(request):
-    username = request.user.username
+# Create a `logout_request` view to handle HTTP GET request
+def logout_request(request):
     logout(request)
-    data = {"userName": username, "status": "Logged Out"}
+    data = {"userName": ""}
     return JsonResponse(data)
 
 @csrf_exempt
@@ -92,32 +91,32 @@ def get_dealer_details(request, dealer_id):
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
 # Create a `add_review` view to submit a review
+@csrf_exempt
 def add_review(request):
-    if not request.user.is_anonymous:
-        data = json.loads(request.body)
-        try:
-            post_request(data)
-            return JsonResponse({"status": 200})
-        except:
-            return JsonResponse({"status": 401, "message": "Error in posting review"})
-    else:
-        return JsonResponse({"status": 403, "message": "Unauthorized"})
+    if request.method == "POST":
+        if not request.user.is_anonymous:
+            try:
+                data = json.loads(request.body)
+                post_request(data)
+                return JsonResponse({"status": 200})
+            except Exception as e:
+                return JsonResponse({"status": 401, "message": "Error in posting review: " + str(e)})
+        else:
+            return JsonResponse({"status": 403, "message": "Unauthorized"})
+    return JsonResponse({"status": 405, "message": "Method not allowed"})
 
+# Create a `get_cars` view to handle HTTP GET request
 def get_cars(request):
     count = CarMake.objects.filter().count()
     if count == 0:
-        # Populate with initial data if empty
-        toyota = CarMake.objects.create(name="Toyota", description="Japanese multinational automotive manufacturer", country="Japan")
-        honda = CarMake.objects.create(name="Honda", description="Japanese multinational conglomerate", country="Japan")
-        CarModel.objects.create(car_make=toyota, name="Camry", type="Sedan", year=2024, dealer_id=1)
-        CarModel.objects.create(car_make=honda, name="Civic", type="Sedan", year=2023, dealer_id=1)
-
+        initiate()
     car_models = CarModel.objects.select_related('car_make')
     cars = []
     for car_model in car_models:
-        cars.append({"model": car_model.name, "make": car_model.car_make.name, "type": car_model.type, "year": car_model.year})
-    return JsonResponse(cars, safe=False)
+        cars.append({"CarMake": car_model.car_make.name, "CarModel": car_model.name})
+    return JsonResponse({"CarModels": cars})
 
+# Create a `analyze_review` view to handle sentiment analysis
 def analyze_review(request, review_text):
     sentiment = analyze_review_sentiment(review_text)
-    return JsonResponse(sentiment)
+    return JsonResponse({"sentiment": sentiment})

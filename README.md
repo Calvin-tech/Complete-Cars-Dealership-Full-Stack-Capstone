@@ -1,7 +1,7 @@
-# Cars Dealership Full-Stack Application
+# fullstack_developer_capstone
 
-## Project Description
-The Cars Dealership project is a comprehensive full-stack web application designed for a national car retailer in the United States. The platform enables users to browse various dealership branches, view customer reviews, and submit their own experiences. A key feature of the application is the integration of a sentiment analysis microservice that evaluates the tone of user reviews in real-time.
+## Project Overview
+This is the final project for the Full-stack development Capstone...
 
 The architecture follows a microservices-based approach:
 - **Main Web Application**: Built with **Django** to manage car makes, models, and core business logic.

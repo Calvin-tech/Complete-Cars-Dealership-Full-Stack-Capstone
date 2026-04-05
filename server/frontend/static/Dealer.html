@@ -70,36 +70,16 @@
     </script>
 
     <main class="container py-5">
-        <div class="card mb-5 overflow-hidden" style="border-radius: 32px;">
-            <div class="row no-gutters">
-                <div class="col-md-6">
-                    <img src="https://images.unsplash.com/photo-1562141989-c5c79ac8f576?auto=format&fit=crop&q=80&w=1200" class="img-fluid h-100" style="object-fit: cover;" alt="Kansas Auto">
-                </div>
-                <div class="col-md-6">
-                    <div class="card-body p-lg-5">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <span class="rating-badge">4.8 ★</span>
-                            <span class="text-muted small font-weight-bold">120 VERIFIED REVIEWS</span>
-                        </div>
-                        <h1 style="font-weight: 800; font-size: 3rem; margin-bottom: 1.5rem;">Kansas Auto Dealership</h1>
-                        <p class="text-muted mb-5" style="font-size: 1.1rem;">Premium certified pre-owned vehicles with a focus on transparency and long-term customer satisfaction in Topeka.</p>
-                        
-                        <div class="row mb-5">
-                            <div class="col-6">
-                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Location</h6>
-                                <p class="font-weight-bold mb-0">45 Sunflower Lane<br>Topeka, KS 66601</p>
-                            </div>
-                            <div class="col-6">
-                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Contact</h6>
-                                <p class="font-weight-bold mb-0">kansas.auto@dealership.com<br>+1 (555) 123-4567</p>
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex">
-                            <a href="/post-review/1/" class="btn btn-primary px-5" style="background: #FF5C35;">Write a Review</a>
-                            <a href="/contact/" class="btn btn-outline ml-3">Contact Dealer</a>
-                        </div>
-                    </div>
+        <div class="mb-4">
+            <a href="/" class="text-muted font-weight-bold" style="text-decoration: none;">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Marketplace
+            </a>
+        </div>
+        <div id="dealer-details-container">
+            <!-- Content will be dynamically loaded here -->
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
                 </div>
             </div>
         </div>
@@ -108,25 +88,7 @@
             <div class="col-lg-8">
                 <h3 style="font-weight: 800; margin-bottom: 2rem;">Customer Experience</h3>
                 <div id="reviews-list">
-                    <div class="card mb-4 p-2">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-light rounded-circle mr-3" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--primary);">JS</div>
-                                    <div>
-                                        <h6 class="font-weight-bold mb-0">John Smith</h6>
-                                        <span class="text-muted small">Feb 15, 2026</span>
-                                    </div>
-                                </div>
-                                <span class="badge badge-success">POSITIVE</span>
-                            </div>
-                            <p class="mb-4" style="font-size: 1.05rem;">"The experience was seamless from start to finish. The staff was incredibly knowledgeable and helped me navigate the financing options without any pressure."</p>
-                            <div class="bg-light px-3 py-2 rounded-lg d-inline-block">
-                                <span class="small font-weight-bold text-muted">PURCHASED:</span>
-                                <span class="small font-weight-bold ml-2">Toyota Camry (2024)</span>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Reviews will be dynamically loaded here -->
                 </div>
             </div>
             <div class="col-lg-4">
@@ -152,5 +114,107 @@
             <p class="text-muted small mt-2">&copy; 2026 Cars Dealership. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Bootstrap & jQuery Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        async function fetchDealerAndReviews() {
+            const urlPath = window.location.pathname;
+            const dealerId = urlPath.split('/').filter(p => p !== "").pop();
+            
+            if (!dealerId || isNaN(dealerId)) {
+                document.getElementById('dealer-details-container').innerHTML = '<div class="alert alert-danger">Invalid Dealer ID</div>';
+                return;
+            }
+
+            try {
+                // Fetch Dealer Details
+                const dealerRes = await fetch(`/djangoapp/dealer/${dealerId}/?t=${new Date().getTime()}`);
+                const dealer = await dealerRes.json();
+                
+                if (dealer) {
+                    const detailsContainer = document.getElementById('dealer-details-container');
+                    detailsContainer.innerHTML = `
+                        <div class="card mb-5 overflow-hidden" style="border-radius: 32px;">
+                            <div class="row no-gutters">
+                                <div class="col-md-6">
+                                    <img src="${dealer.image || '/static/images/Dealerships/young-couple-talking-sales-person-car-showroom.jpg'}" class="img-fluid h-100" style="object-fit: cover;" alt="${dealer.full_name}">
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card-body p-lg-5">
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <span class="rating-badge">4.8 ★</span>
+                                            <span class="text-muted small font-weight-bold">VERIFIED REVIEWS</span>
+                                        </div>
+                                        <h1 style="font-weight: 800; font-size: 3rem; margin-bottom: 1.5rem;">${dealer.full_name}</h1>
+                                        <p class="text-muted mb-5" style="font-size: 1.1rem;">Premium certified pre-owned vehicles with a focus on transparency and long-term customer satisfaction in ${dealer.city}.</p>
+                                        
+                                        <div class="row mb-5">
+                                            <div class="col-6">
+                                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Location</h6>
+                                                <p class="font-weight-bold mb-0">${dealer.address}<br>${dealer.city}, ${dealer.st} ${dealer.zip}</p>
+                                            </div>
+                                            <div class="col-6">
+                                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Contact</h6>
+                                                <p class="font-weight-bold mb-0">${dealer.short_name.toLowerCase().replace(' ', '.')}@dealership.com<br>+1 (555) 123-4567</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex">
+                                            ${localStorage.getItem('username') ? `<a href="/post-review/${dealer.id}/" class="btn btn-primary px-5" style="background: #FF5C35;">Write a Review</a>` : ''}
+                                            <a href="/contact/" class="btn btn-outline ml-3">Contact Dealer</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Fetch Reviews
+                const reviewsRes = await fetch(`/djangoapp/get_reviews/${dealerId}/?t=${new Date().getTime()}`);
+                const reviews = await reviewsRes.json();
+                const reviewsList = document.getElementById('reviews-list');
+                
+                if (reviews && reviews.length > 0) {
+                    reviewsList.innerHTML = '';
+                    reviews.forEach(review => {
+                        const sentimentClass = review.sentiment === 'positive' ? 'badge-success' : (review.sentiment === 'negative' ? 'badge-danger' : 'badge-warning');
+                        reviewsList.innerHTML += `
+                            <div class="card mb-4 p-2">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle mr-3" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #FF5C35;">${review.name.substring(0,2).toUpperCase()}</div>
+                                            <div>
+                                                <h6 class="font-weight-bold mb-0">${review.name}</h6>
+                                                <span class="text-muted small">${review.purchase_date}</span>
+                                            </div>
+                                        </div>
+                                        <span class="badge ${sentimentClass}">${review.sentiment.toUpperCase()}</span>
+                                    </div>
+                                    <p class="mb-4" style="font-size: 1.05rem;">"${review.review}"</p>
+                                    <div class="bg-light px-3 py-2 rounded-lg d-inline-block">
+                                        <span class="small font-weight-bold text-muted">PURCHASED:</span>
+                                        <span class="small font-weight-bold ml-2">${review.car_make} ${review.car_model} (${review.car_year})</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    reviewsList.innerHTML = '<p class="text-muted">No reviews yet for this dealership.</p>';
+                }
+
+            } catch (err) {
+                console.error("Error loading dealer details:", err);
+                document.getElementById('dealer-details-container').innerHTML = '<div class="alert alert-danger">Error loading dealership data</div>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchDealerAndReviews);
+    </script>
 </body>
 </html>

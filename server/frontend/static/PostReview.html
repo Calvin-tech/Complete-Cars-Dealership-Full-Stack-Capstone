@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post Review | Cars Dealership</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="bg-light">
@@ -67,49 +68,49 @@
     </script>
 
     <main class="container py-5">
+        <div class="mb-4">
+            <a href="javascript:history.back()" class="text-muted font-weight-bold" style="text-decoration: none;">
+                <i class="fas fa-arrow-left mr-2"></i>Back
+            </a>
+        </div>
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card p-5" style="border-radius: 32px;">
                     <div class="mb-5">
-                        <h2 style="font-weight: 800;">Write a Review</h2>
-                        <p class="text-muted">Share your experience with <strong>Kansas Auto Dealership</strong></p>
+                        <h2 style="font-weight: 800;"><i class="fas fa-edit text-primary mr-3"></i>Write a Review</h2>
+                        <p class="text-muted" id="dealer-name-display">Share your experience with <strong>Dealership</strong></p>
                     </div>
                     
-                    <form>
+                    <form id="reviewForm">
                         <div class="row">
                             <div class="col-md-6 mb-4">
-                                <label class="small font-weight-bold text-muted text-uppercase">Car Make</label>
-                                <select class="form-control" style="height: 56px;">
-                                    <option>Select Make</option>
-                                    <option>Toyota</option>
-                                    <option>Honda</option>
-                                    <option>Ford</option>
+                                <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-car mr-2"></i>Car Make</label>
+                                <select class="form-control" id="carMake" style="height: 56px;" required onchange="updateModels()">
+                                    <option value="">Select Make</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-4">
-                                <label class="small font-weight-bold text-muted text-uppercase">Car Model</label>
-                                <select class="form-control" style="height: 56px;">
-                                    <option>Select Model</option>
-                                    <option>Camry</option>
-                                    <option>Civic</option>
-                                    <option>F-150</option>
+                                <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-list mr-2"></i>Car Model</label>
+                                <select class="form-control" id="carModel" style="height: 56px;" required disabled>
+                                    <option value="">Select Model</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group mb-4">
-                            <label class="small font-weight-bold text-muted text-uppercase">Purchase Date</label>
-                            <input type="date" class="form-control" style="height: 56px;">
+                            <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-calendar-alt mr-2"></i>Purchase Date</label>
+                            <input type="date" id="purchaseDate" class="form-control" style="height: 56px;" required>
                         </div>
                         <div class="form-group mb-4">
-                            <label class="small font-weight-bold text-muted text-uppercase">Your Review</label>
-                            <textarea class="form-control" rows="5" placeholder="What did you think of the service?" style="padding-top: 1rem;"></textarea>
+                            <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-comment-dots mr-2"></i>Your Review</label>
+                            <textarea id="reviewText" class="form-control" rows="5" placeholder="What did you think of the service?" style="padding-top: 1rem;" required></textarea>
                         </div>
                         <div class="custom-control custom-checkbox mb-5">
                             <input type="checkbox" class="custom-control-input" id="purchaseCheck">
-                            <label class="custom-control-label font-weight-bold small text-muted" for="purchaseCheck">I PURCHASED A CAR FROM THIS DEALER</label>
+                            <label class="custom-control-label font-weight-bold small text-muted" for="purchaseCheck"><i class="fas fa-check-circle mr-2"></i>I PURCHASED A CAR FROM THIS DEALER</label>
                         </div>
-                        <button type="submit" class="btn btn-primary px-5 py-3">Submit Review</button>
+                        <button type="submit" class="btn btn-primary px-5 py-3 font-weight-bold rounded-pill"><i class="fas fa-paper-plane mr-2"></i>Submit Review</button>
                     </form>
+                    <div id="submitMessage" class="mt-3 small font-weight-bold"></div>
                 </div>
             </div>
         </div>
@@ -120,5 +121,117 @@
             <p class="small text-muted mb-0">&copy; 2026 Cars Dealership. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Bootstrap & jQuery Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let dealerId = "";
+        let carData = [];
+
+        async function initPage() {
+            const urlPath = window.location.pathname;
+            dealerId = urlPath.split('/').filter(p => p !== "").pop();
+            
+            if (!dealerId || isNaN(dealerId)) {
+                alert("Invalid Dealer ID");
+                window.location.href = "/";
+                return;
+            }
+
+            // Fetch Dealer Name
+            try {
+                const res = await fetch(`/djangoapp/dealer/${dealerId}`);
+                const dealer = await res.json();
+                if (dealer) {
+                    document.getElementById('dealer-name-display').innerHTML = `Share your experience with <strong>${dealer.full_name}</strong>`;
+                }
+            } catch(e) { console.error(e); }
+
+            // Fetch Car Makes and Models
+            try {
+                const res = await fetch('/djangoapp/get_cars');
+                carData = await res.json();
+                const makeSelect = document.getElementById('carMake');
+                const uniqueMakes = [...new Set(carData.map(c => c.make))];
+                uniqueMakes.forEach(make => {
+                    const opt = document.createElement('option');
+                    opt.value = make;
+                    opt.innerText = make;
+                    makeSelect.appendChild(opt);
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        function updateModels() {
+            const make = document.getElementById('carMake').value;
+            const modelSelect = document.getElementById('carModel');
+            modelSelect.innerHTML = '<option value="">Select Model</option>';
+            
+            if (!make) {
+                modelSelect.disabled = true;
+                return;
+            }
+
+            const models = carData.filter(c => c.make === make);
+            models.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.model;
+                opt.innerText = m.model;
+                modelSelect.appendChild(opt);
+            });
+            modelSelect.disabled = false;
+        }
+
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('submitMessage');
+            messageDiv.innerText = 'Submitting review...';
+            messageDiv.className = 'mt-3 small font-weight-bold text-primary';
+
+            const selectedModel = carData.find(c => c.model === document.getElementById('carModel').value && c.make === document.getElementById('carMake').value);
+
+            const data = {
+                "name": localStorage.getItem('username'),
+                "dealership": parseInt(dealerId),
+                "review": document.getElementById('reviewText').value,
+                "purchase": document.getElementById('purchaseCheck').checked,
+                "purchase_date": document.getElementById('purchaseDate').value,
+                "car_make": document.getElementById('carMake').value,
+                "car_model": document.getElementById('carModel').value,
+                "car_year": selectedModel ? selectedModel.year : 2024
+            };
+
+            try {
+                const response = await fetch('/djangoapp/add_review/', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === 200) {
+                    messageDiv.className = 'mt-3 small font-weight-bold text-success';
+                    messageDiv.innerText = 'Review posted successfully! Redirecting...';
+                    setTimeout(() => {
+                        window.location.href = `/dealer/${dealerId}/`;
+                    }, 1500);
+                } else {
+                    messageDiv.className = 'mt-3 small font-weight-bold text-danger';
+                    messageDiv.innerText = 'Failed to post review: ' + (result.message || 'Unknown error');
+                }
+            } catch (err) {
+                console.error(err);
+                messageDiv.className = 'mt-3 small font-weight-bold text-danger';
+                messageDiv.innerText = 'Network error occurred.';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
 </body>
 </html>

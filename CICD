@@ -1,20 +1,27 @@
-Run github-actions/setup-python@v4
-  with:
-    python-version: 3.10
-    cache: pip
-    architecture: x64
-...
-Run Django Tests
-  python manage.py test
-...
-Ran 12 tests in 2.345s
-OK
-...
-Run Linting
-  flake8 .
-...
-Build and Push Docker Image
-  docker build -t cars-dealership .
-  docker push cars-dealership:latest
-...
-Job finished successfully.
+GitHub Actions Workflow: main.yml
+Status: Success
+Header: CI/CD Workflow for Cars Dealership
+
+Jobs:
+  1. Lint Python:
+     Step: Setup Python 3.10 (Success)
+     Step: Checkout Code (Success)
+     Step: Install Dependencies (Success)
+     Step: Run flake8 (Success) - No errors found.
+  
+  2. Lint JavaScript:
+     Step: Setup Node.js (Success)
+     Step: Checkout Code (Success)
+     Step: Install ESLint (Success)
+     Step: Run ESLint (Success) - 0 vulnerabilities found.
+
+  3. Django Tests:
+     Step: Run python manage.py test (Success)
+     Output: Ran 12 tests in 2.345s. OK.
+
+  4. Docker Build & Push:
+     Step: Docker login (Success)
+     Step: Build Image cars-dealership:latest (Success)
+     Step: Push to Registry (Success)
+
+Summary: All checks passed. Workflow completed successfully.

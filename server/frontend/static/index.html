@@ -113,6 +113,19 @@
 
             <!-- Main Content -->
             <div class="col-lg-9">
+                <!-- Task 19: Search by State -->
+                <div class="search-container mb-4">
+                    <div class="input-group bg-white p-2 rounded-pill shadow-sm">
+                        <div class="input-group-prepend border-0">
+                            <span class="btn bg-white text-muted border-0"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" id="state-search" class="form-control border-0 bg-white" placeholder="Search dealerships by State (e.g. Kansas)..." onkeyup="searchByState(this.value)">
+                        <div class="input-group-append border-0">
+                            <button class="btn btn-primary rounded-pill px-4" onclick="searchByState(document.getElementById('state-search').value)">Search</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Type Selectors -->
                 <div class="type-selector">
                     <div class="type-btn active" onclick="filterType('Sedan', this)">
@@ -137,8 +150,38 @@
                     </div>
                 </div>
 
+                <!-- Task 16/17: Dealer Table Section -->
+                <div class="mb-5">
+                    <h2 class="mb-4" style="font-weight: 800;">Our Dealerships</h2>
+                    <div class="table-responsive bg-white p-4 shadow-sm" style="border-radius: 24px;">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Dealer Name</th>
+                                    <th>City</th>
+                                    <th>Address</th>
+                                    <th>Zip</th>
+                                    <th>State</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dealerships-table-body">
+                                <!-- Table content will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Dealerships Cards Section (Optional for Visual) -->
+                <div class="mb-5 d-none">
+                    <div class="row" id="dealerships-container">
+                        <!-- Dealerships will be loaded here -->
+                    </div>
+                </div>
+
                 <!-- Listings -->
-                <div class="row" id="dealer-list">
+                <h2 class="mb-4" style="font-weight: 800;">Featured Cars</h2>
+                <div class="row" id="car-list">
                     <!-- BMW -->
                     <div class="col-md-6 mb-4 car-card" data-price="55300" data-type="Sedan">
                         <div class="card p-3">
@@ -223,7 +266,7 @@
                     <!-- Tesla -->
                     <div class="col-md-6 mb-4 car-card" data-price="42000" data-type="Sedan">
                         <div class="card p-3">
-                            <img src="/static/images/pexels-matus-burian-6692972-6720668.jpg" class="card-img-top mb-4" style="border-radius: 24px;" alt="Tesla Model 3">
+                            <img src="/static/images/pexels-mikebirdy-244206.jpg" class="card-img-top mb-4" style="border-radius: 24px;" alt="Tesla Model 3">
                             <div class="card-body p-0">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h5 class="font-weight-bold mb-0">Tesla Model 3</h5>
@@ -238,7 +281,7 @@
                                 <div class="car-location"><i class="fas fa-map-marker-alt"></i><span>Oslo, NO</span></div>
                                 <p class="text-muted small mb-4">The future of driving. Zero emissions, high performance, and cutting-edge technology.</p>
                                 <div class="d-flex gap-2">
-                                    <button class="buy-now-btn" onclick="showQuickView('Tesla Model 3', '42 000 €', ['/static/images/pexels-matus-burian-6692972-6720668.jpg'], 'Oslo, NO', 'The future of driving. Zero emissions, high performance, and cutting-edge technology.')"><i class="fas fa-eye"></i>View now</button>
+                                    <button class="buy-now-btn" onclick="showQuickView('Tesla Model 3', '42 000 €', ['/static/images/pexels-mikebirdy-244206.jpg'], 'Oslo, NO', 'The future of driving. Zero emissions, high performance, and cutting-edge technology.')"><i class="fas fa-eye"></i>View now</button>
                                     <button class="heart-btn ml-2" onclick="toggleLike(this)"><i class="far fa-heart"></i></button>
                                 </div>
                             </div>
@@ -424,12 +467,16 @@
                     `;
                 }
 
+                let profileImg = '/static/images/pexels-matus-burian-6692972-6720668.jpg'; // Default Admin
+                if (role === 'buyer') profileImg = '/static/images/pexels-introspectivedsgn-4077265.jpg';
+                else if (role === 'dealer') profileImg = '/static/images/pexels-introspectivedsgn-4653739.jpg';
+
                 authSection.innerHTML = `
                     <div class="nav-icons-group">
                         ${iconsHtml}
                         <div class="dropdown">
-                            <a href="#" class="nav-icon-link dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="far fa-user-circle"></i>
+                            <a href="#" class="nav-icon-link dropdown-toggle d-flex align-items-center" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="text-decoration: none;">
+                                <img src="${profileImg}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-light);">
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
                                 <h6 class="dropdown-header">Hello, ${user}</h6>
@@ -471,8 +518,73 @@
             }
         }
 
+        async function fetchDealerships(state = "All") {
+            try {
+                let url = '/djangoapp/get_dealers/';
+                if (state !== "All" && state.trim() !== "") {
+                    url = `/djangoapp/get_dealers/${state}/`;
+                }
+                const response = await fetch(url);
+                const dealers = await response.json();
+                
+                // Update Table (Task 16/17)
+                const tableBody = document.getElementById('dealerships-table-body');
+                tableBody.innerHTML = '';
+                
+                if (dealers.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No dealerships found.</td></tr>';
+                    return;
+                }
+
+                dealers.forEach(dealer => {
+                    tableBody.innerHTML += `
+                        <tr onclick="window.location.href='/dealer/${dealer.id}/'" style="cursor: pointer;">
+                            <td>${dealer.id}</td>
+                            <td class="font-weight-bold text-primary">${dealer.full_name}</td>
+                            <td>${dealer.city}</td>
+                            <td>${dealer.address}</td>
+                            <td>${dealer.zip}</td>
+                            <td>${dealer.state}</td>
+                        </tr>
+                    `;
+                });
+
+                // Update Cards (Keep for functional compatibility)
+                const container = document.getElementById('dealerships-container');
+                container.innerHTML = '';
+                dealers.forEach(dealer => {
+                    container.innerHTML += `
+                        <div class="col-md-6 mb-4">
+                            <div class="card p-3 border-0 shadow-sm" style="border-radius: 24px;">
+                                <img src="${dealer.image || '/static/images/Dealerships/young-couple-talking-sales-person-car-showroom.jpg'}" class="card-img-top mb-3" style="border-radius: 16px; height: 180px; object-fit: cover;" alt="${dealer.full_name}">
+                                <div class="card-body p-0">
+                                    <h5 class="font-weight-bold mb-1">${dealer.full_name}</h5>
+                                    <p class="text-muted small mb-3"><i class="fas fa-map-marker-alt mr-2"></i>${dealer.city}, ${dealer.state}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="/dealer/${dealer.id}/" class="btn btn-outline-primary btn-sm rounded-pill px-4">View Details</a>
+                                        ${localStorage.getItem('username') ? `<a href="/post-review/${dealer.id}/" class="btn btn-primary btn-sm rounded-pill px-4">Review Dealer</a>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error('Failed to fetch dealerships', err);
+            }
+        }
+
+        let searchTimeout;
+        function searchByState(val) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                fetchDealerships(val || "All");
+            }, 500);
+        }
+
         // Initialize Navbar
         updateNavbar();
+        fetchDealerships();
 
         const brandModels = {
             'Mercedes-Benz': ['AMG GT', 'A 150', 'Citan', 'E-Class', 'S-Class'],
