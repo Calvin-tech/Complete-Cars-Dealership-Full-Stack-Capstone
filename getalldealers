@@ -1,0 +1,29 @@
+curl -X GET http://127.0.0.1:8000/djangoapp/get_dealers
+
+Output:
+[
+  {
+    "id": 1,
+    "city": "Topeka",
+    "state": "Kansas",
+    "st": "KS",
+    "address": "456 Sunflower Lane",
+    "zip": "66601",
+    "lat": 39.0473,
+    "long": -95.6752,
+    "short_name": "Kansas Auto",
+    "full_name": "Kansas Auto Dealership"
+  },
+  {
+    "id": 2,
+    "city": "New York City",
+    "state": "New York",
+    "st": "NY",
+    "address": "789 Broadway",
+    "zip": "10003",
+    "lat": 40.7128,
+    "long": -74.0060,
+    "short_name": "NYC Motors",
+    "full_name": "New York City Motors"
+  }
+]

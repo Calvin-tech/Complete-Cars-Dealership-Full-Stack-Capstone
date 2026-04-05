@@ -1,0 +1,17 @@
+curl -X GET http://127.0.0.1:8000/djangoapp/get_reviews/1
+
+Output:
+[
+  {
+    "id": 1,
+    "name": "Berkeley Dealership",
+    "dealership": 1,
+    "review": "Great service and friendly staff!",
+    "purchase": true,
+    "purchase_date": "02/15/2026",
+    "car_make": "Toyota",
+    "car_model": "Camry",
+    "car_year": 2024,
+    "sentiment": "positive"
+  }
+]

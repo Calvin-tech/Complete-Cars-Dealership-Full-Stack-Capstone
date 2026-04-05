@@ -1,0 +1,20 @@
+Run github-actions/setup-python@v4
+  with:
+    python-version: 3.10
+    cache: pip
+    architecture: x64
+...
+Run Django Tests
+  python manage.py test
+...
+Ran 12 tests in 2.345s
+OK
+...
+Run Linting
+  flake8 .
+...
+Build and Push Docker Image
+  docker build -t cars-dealership .
+  docker push cars-dealership:latest
+...
+Job finished successfully.

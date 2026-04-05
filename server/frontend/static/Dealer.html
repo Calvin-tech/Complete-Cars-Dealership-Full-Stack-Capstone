@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dealer Details | Cars Dealership</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars<span>Dealership</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+                </ul>
+                <div class="navbar-nav ml-auto align-items-center" id="nav-auth-section">
+                    <a class="nav-link" href="/login/">Log in</a>
+                    <a class="btn btn-primary ml-lg-3" href="/register/">Sign up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function updateNavbar() {
+            const authSection = document.getElementById('nav-auth-section');
+            const user = localStorage.getItem('username');
+            const role = localStorage.getItem('userRole');
+            
+            if (user && user !== "undefined" && user !== "null") {
+                authSection.innerHTML = `
+                    <div class="nav-icons-group">
+                        <a href="#" class="nav-icon-link"><i class="far fa-heart"></i><span class="badge badge-pill badge-primary">2</span></a>
+                        <a href="#" class="nav-icon-link"><i class="fas fa-shopping-cart"></i><span class="badge badge-pill badge-primary">0</span></a>
+                        <div class="dropdown">
+                            <a href="#" class="nav-icon-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="far fa-user-circle"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h6 class="dropdown-header">Hello, ${user}</h6>
+                                <a id="dashboard-link" class="dropdown-item" href="#"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                const dashLink = document.getElementById('dashboard-link');
+                if (role === 'admin') dashLink.href = '/admin-dashboard/';
+                else if (role === 'dealer') dashLink.href = '/dealer-dashboard/';
+                else dashLink.href = '/buyer-dashboard/';
+            }
+        }
+        async function logout() {
+            try { await fetch('/djangoapp/logout/'); } catch(e) {}
+            localStorage.removeItem('username');
+            localStorage.removeItem('userRole');
+            window.location.href = '/';
+        }
+        document.addEventListener('DOMContentLoaded', updateNavbar);
+    </script>
+
+    <main class="container py-5">
+        <div class="card mb-5 overflow-hidden" style="border-radius: 32px;">
+            <div class="row no-gutters">
+                <div class="col-md-6">
+                    <img src="https://images.unsplash.com/photo-1562141989-c5c79ac8f576?auto=format&fit=crop&q=80&w=1200" class="img-fluid h-100" style="object-fit: cover;" alt="Kansas Auto">
+                </div>
+                <div class="col-md-6">
+                    <div class="card-body p-lg-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="rating-badge">4.8 ★</span>
+                            <span class="text-muted small font-weight-bold">120 VERIFIED REVIEWS</span>
+                        </div>
+                        <h1 style="font-weight: 800; font-size: 3rem; margin-bottom: 1.5rem;">Kansas Auto Dealership</h1>
+                        <p class="text-muted mb-5" style="font-size: 1.1rem;">Premium certified pre-owned vehicles with a focus on transparency and long-term customer satisfaction in Topeka.</p>
+                        
+                        <div class="row mb-5">
+                            <div class="col-6">
+                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Location</h6>
+                                <p class="font-weight-bold mb-0">45 Sunflower Lane<br>Topeka, KS 66601</p>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Contact</h6>
+                                <p class="font-weight-bold mb-0">kansas.auto@dealership.com<br>+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <a href="/post-review/1/" class="btn btn-primary px-5" style="background: #FF5C35;">Write a Review</a>
+                            <a href="/contact/" class="btn btn-outline ml-3">Contact Dealer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <h3 style="font-weight: 800; margin-bottom: 2rem;">Customer Experience</h3>
+                <div id="reviews-list">
+                    <div class="card mb-4 p-2">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded-circle mr-3" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--primary);">JS</div>
+                                    <div>
+                                        <h6 class="font-weight-bold mb-0">John Smith</h6>
+                                        <span class="text-muted small">Feb 15, 2026</span>
+                                    </div>
+                                </div>
+                                <span class="badge badge-success">POSITIVE</span>
+                            </div>
+                            <p class="mb-4" style="font-size: 1.05rem;">"The experience was seamless from start to finish. The staff was incredibly knowledgeable and helped me navigate the financing options without any pressure."</p>
+                            <div class="bg-light px-3 py-2 rounded-lg d-inline-block">
+                                <span class="small font-weight-bold text-muted">PURCHASED:</span>
+                                <span class="small font-weight-bold ml-2">Toyota Camry (2024)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card p-4" style="border-radius: 24px;">
+                    <h5 class="font-weight-bold mb-4">Business Hours</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="d-flex justify-content-between mb-3"><span>Monday</span><span class="text-muted font-weight-bold">9:00 - 18:00</span></li>
+                        <li class="d-flex justify-content-between mb-3"><span>Tuesday</span><span class="text-muted font-weight-bold">9:00 - 18:00</span></li>
+                        <li class="d-flex justify-content-between mb-3"><span>Wednesday</span><span class="text-muted font-weight-bold">9:00 - 18:00</span></li>
+                        <li class="d-flex justify-content-between mb-3"><span>Thursday</span><span class="text-muted font-weight-bold">9:00 - 18:00</span></li>
+                        <li class="d-flex justify-content-between mb-3"><span>Friday</span><span class="text-muted font-weight-bold">9:00 - 18:00</span></li>
+                        <li class="d-flex justify-content-between mb-3"><span>Saturday</span><span class="text-muted font-weight-bold">10:00 - 16:00</span></li>
+                        <li class="d-flex justify-content-between"><span>Sunday</span><span class="text-danger font-weight-bold">Closed</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer bg-white mt-5">
+        <div class="container text-center py-4">
+            <div class="footer-logo mb-0">Cars<span>Dealership</span></div>
+            <p class="text-muted small mt-2">&copy; 2026 Cars Dealership. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

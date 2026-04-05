@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cars Dealership | Premium Marketplace</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <!-- Consistent Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars<span>Dealership</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+                </ul>
+                <div class="navbar-nav ml-auto align-items-center" id="nav-auth-section">
+                    <!-- Auth items will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <aside class="col-lg-3">
+                <div class="buy-header">
+                    <h1 class="mb-0" style="font-weight: 800; font-size: 3.5rem;">Buy a car</h1>
+                    <span class="count-badge" id="car-count">1637</span>
+                </div>
+
+                <div class="filter-card">
+                    <div class="filter-title">
+                        <span>Make and model</span>
+                        <span class="filter-reset" onclick="resetFilters()">Reset</span>
+                    </div>
+                    <div id="selected-models" class="mb-3">
+                        <div class="input-group mb-2 border rounded-lg p-3 align-items-center">
+                            <img src="/static/images/logo/mercedes.png" class="brand-icon" alt="Mercedes">
+                            <div class="flex-grow-1">
+                                <div class="font-weight-bold small">Mercedes-Benz</div>
+                                <div class="mt-1">
+                                    <span class="model-tag">AMG GT</span>
+                                    <span class="model-tag">A 150</span>
+                                </div>
+                            </div>
+                            <div class="close-circle" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        <div class="input-group mb-2 border rounded-lg p-3 align-items-center">
+                            <img src="/static/images/logo/bmw.png" class="brand-icon" alt="BMW">
+                            <div class="flex-grow-1">
+                                <div class="font-weight-bold small">BMW</div>
+                                <div class="mt-1">
+                                    <span class="model-tag">X7</span>
+                                    <span class="model-tag">M2</span>
+                                </div>
+                            </div>
+                            <div class="close-circle" onclick="this.parentElement.remove()">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-block py-2" style="background: #FF5C35;" data-toggle="modal" data-target="#addModelModal">+ Add model</button>
+                </div>
+
+                <div class="filter-card">
+                    <div class="filter-title">
+                        <span>Price</span>
+                        <span class="filter-reset" onclick="resetPrice()">Reset</span>
+                    </div>
+                    <div class="price-slider-container">
+                        <input type="range" id="priceRange" min="5000" max="150000" step="1000" value="150000" oninput="updatePrice(this.value)">
+                        <div class="price-values">
+                            <input type="text" class="price-input" value="5 000 €" readonly>
+                            <input type="text" id="maxPriceInput" class="price-input text-right" value="150 000 €" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-card">
+                    <div class="filter-title">
+                        <span>Fuel Type</span>
+                    </div>
+                    <div class="custom-control custom-checkbox mb-2">
+                        <input type="checkbox" class="custom-control-input" id="fuelPetrol" checked>
+                        <label class="custom-control-label small font-weight-bold" for="fuelPetrol">Petrol</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mb-2">
+                        <input type="checkbox" class="custom-control-input" id="fuelDiesel">
+                        <label class="custom-control-label small font-weight-bold" for="fuelDiesel">Diesel</label>
+                    </div>
+                    <div class="custom-control custom-checkbox mb-2">
+                        <input type="checkbox" class="custom-control-input" id="fuelElectric" checked>
+                        <label class="custom-control-label small font-weight-bold" for="fuelElectric">Electric</label>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="fuelHybrid" checked>
+                        <label class="custom-control-label small font-weight-bold" for="fuelHybrid">Hybrid</label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Type Selectors -->
+                <div class="type-selector">
+                    <div class="type-btn active" onclick="filterType('Sedan', this)">
+                        <i class="fas fa-car-side"></i>
+                        <span>Sedan</span>
+                    </div>
+                    <div class="type-btn" onclick="filterType('SUV', this)">
+                        <i class="fas fa-truck-pickup"></i>
+                        <span>SUV</span>
+                    </div>
+                    <div class="type-btn" onclick="filterType('Hatchback', this)">
+                        <i class="fas fa-car"></i>
+                        <span>Hatchback</span>
+                    </div>
+                    <div class="type-btn" onclick="filterType('Coupe', this)">
+                        <i class="fas fa-car-rear"></i>
+                        <span>Coupe</span>
+                    </div>
+                    <div class="type-btn" onclick="filterType('Sport', this)">
+                        <i class="fas fa-bolt"></i>
+                        <span>Sport cars</span>
+                    </div>
+                </div>
+
+                <!-- Listings -->
+                <div class="row" id="dealer-list">
+                    <!-- BMW -->
+                    <div class="col-md-6 mb-4 car-card" data-price="55300" data-type="Sedan">
+                        <div class="card p-3">
+                            <img src="/static/images/pexels-mikebirdy-17476943.jpg" class="card-img-top mb-4" style="border-radius: 24px;" alt="BMW 850i">
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="font-weight-bold mb-0">BMW 850i xDrive</h5>
+                                    <span class="car-price">55 300 €</span>
+                                </div>
+                                <div class="car-specs">
+                                    <div class="spec-item"><i class="fas fa-tachometer-alt"></i><span>7 700 km</span></div>
+                                    <div class="spec-item"><i class="fas fa-gas-pump"></i><span>Petrol</span></div>
+                                    <div class="spec-item"><i class="fas fa-engine"></i><span>390 kW</span></div>
+                                    <div class="spec-item"><i class="fas fa-gears"></i><span>4WD</span></div>
+                                </div>
+                                <div class="car-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Budapest, HU</span>
+                                </div>
+                                <p class="text-muted small mb-4">A dream car for true connoisseurs of automotive art! The BMW 850i xDrive is the epitome of luxury, style and power.</p>
+                                <div class="d-flex gap-2">
+                                    <button class="buy-now-btn" onclick="showQuickView('BMW 850i xDrive', '55 300 €', ['/static/images/pexels-mikebirdy-17476943.jpg', '/static/images/pexels-mikebirdy-17476971.jpg', '/static/images/pexels-mikebirdy-17476974.jpg'], 'Budapest, HU', 'A dream car for true connoisseurs of automotive art! The BMW 850i xDrive is the epitome of luxury, style and power.')"><i class="fas fa-eye"></i>View now</button>
+                                    <button class="heart-btn ml-2" onclick="toggleLike(this)"><i class="far fa-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mercedes -->
+                    <div class="col-md-6 mb-4 car-card" data-price="32509" data-type="Hatchback">
+                        <div class="card p-3">
+                            <img src="/static/images/pexels-mikebirdy-5519847.jpg" class="card-img-top mb-4" style="border-radius: 24px;" alt="Mercedes A 250">
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="font-weight-bold mb-0">Mercedes-Benz A 250 e</h5>
+                                    <span class="car-price">32 509 €</span>
+                                </div>
+                                <div class="car-specs">
+                                    <div class="spec-item"><i class="fas fa-tachometer-alt"></i><span>4 227 km</span></div>
+                                    <div class="spec-item"><i class="fas fa-bolt"></i><span>Hybrid</span></div>
+                                    <div class="spec-item"><i class="fas fa-engine"></i><span>160 kW</span></div>
+                                    <div class="spec-item"><i class="fas fa-gears"></i><span>FWD</span></div>
+                                </div>
+                                <div class="car-location">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Bern, CH</span>
+                                </div>
+                                <p class="text-muted small mb-4">The perfect combination of elegance and eco-friendliness! The Mercedes A 250 e offers premium comfort.</p>
+                                <div class="d-flex gap-2">
+                                    <button class="buy-now-btn" onclick="showQuickView('Mercedes-Benz A 250 e', '32 509 €', ['/static/images/pexels-mikebirdy-5519847.jpg'], 'Bern, CH', 'The perfect combination of elegance and eco-friendliness! The Mercedes A 250 e offers premium comfort.')"><i class="fas fa-eye"></i>View now</button>
+                                    <button class="heart-btn ml-2" onclick="toggleLike(this)"><i class="far fa-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audi -->
+                    <div class="col-md-6 mb-4 car-card" data-price="89000" data-type="Sport">
+                        <div class="card p-3">
+                            <img src="/static/images/pexels-vladtsankov-30164532.jpg" class="card-img-top mb-4" style="border-radius: 24px;" alt="Audi RS7">
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="font-weight-bold mb-0">Audi RS7 Sportback</h5>
+                                    <span class="car-price">89 000 €</span>
+                                </div>
+                                <div class="car-specs">
+                                    <div class="spec-item"><i class="fas fa-tachometer-alt"></i><span>12 500 km</span></div>
+                                    <div class="spec-item"><i class="fas fa-gas-pump"></i><span>Petrol</span></div>
+                                    <div class="spec-item"><i class="fas fa-engine"></i><span>441 kW</span></div>
+                                    <div class="spec-item"><i class="fas fa-gears"></i><span>AWD</span></div>
+                                </div>
+                                <div class="car-location"><i class="fas fa-map-marker-alt"></i><span>Berlin, DE</span></div>
+                                <p class="text-muted small mb-4">Unleash the beast with the Audi RS7. Performance meets luxury in this stunning sportback model.</p>
+                                <div class="d-flex gap-2">
+                                    <button class="buy-now-btn" onclick="showQuickView('Audi RS7 Sportback', '89 000 €', ['/static/images/pexels-vladtsankov-30164532.jpg'], 'Berlin, DE', 'Unleash the beast with the Audi RS7. Performance meets luxury in this stunning sportback model.')"><i class="fas fa-eye"></i>View now</button>
+                                    <button class="heart-btn ml-2" onclick="toggleLike(this)"><i class="far fa-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tesla -->
+                    <div class="col-md-6 mb-4 car-card" data-price="42000" data-type="Sedan">
+                        <div class="card p-3">
+                            <img src="/static/images/pexels-matus-burian-6692972-6720668.jpg" class="card-img-top mb-4" style="border-radius: 24px;" alt="Tesla Model 3">
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="font-weight-bold mb-0">Tesla Model 3</h5>
+                                    <span class="car-price">42 000 €</span>
+                                </div>
+                                <div class="car-specs">
+                                    <div class="spec-item"><i class="fas fa-tachometer-alt"></i><span>25 000 km</span></div>
+                                    <div class="spec-item"><i class="fas fa-bolt"></i><span>Electric</span></div>
+                                    <div class="spec-item"><i class="fas fa-engine"></i><span>208 kW</span></div>
+                                    <div class="spec-item"><i class="fas fa-gears"></i><span>RWD</span></div>
+                                </div>
+                                <div class="car-location"><i class="fas fa-map-marker-alt"></i><span>Oslo, NO</span></div>
+                                <p class="text-muted small mb-4">The future of driving. Zero emissions, high performance, and cutting-edge technology.</p>
+                                <div class="d-flex gap-2">
+                                    <button class="buy-now-btn" onclick="showQuickView('Tesla Model 3', '42 000 €', ['/static/images/pexels-matus-burian-6692972-6720668.jpg'], 'Oslo, NO', 'The future of driving. Zero emissions, high performance, and cutting-edge technology.')"><i class="fas fa-eye"></i>View now</button>
+                                    <button class="heart-btn ml-2" onclick="toggleLike(this)"><i class="far fa-heart"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Model Modal -->
+    <div class="modal fade" id="addModelModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title font-weight-bold">Add Car Model</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <div class="close-circle">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="addModelForm">
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-uppercase">Car Make</label>
+                            <select class="form-control custom-select" id="makeSelect" style="height: 56px; border-radius: 12px;">
+                                <option value="" disabled selected>Select brand</option>
+                                <option data-logo="/static/images/logo/audi.jpg">Audi</option>
+                                <option data-logo="/static/images/logo/bmw.png">BMW</option>
+                                <option data-logo="/static/images/logo/mercedes.png">Mercedes-Benz</option>
+                                <option data-logo="/static/images/logo/toyota.png">Toyota</option>
+                                <option data-logo="/static/images/logo/volkswagen.png">Volkswagen</option>
+                                <option data-logo="/static/images/logo/subaru.png">Subaru</option>
+                                <option data-logo="/static/images/logo/tesla.png">Tesla</option>
+                                <option data-logo="/static/images/logo/ford.png">Ford</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-uppercase">Vehicle Category</label>
+                            <select class="form-control custom-select" id="categorySelect" style="height: 56px; border-radius: 12px;">
+                                <option value="" disabled selected>Select type</option>
+                                <option>Sedan</option>
+                                <option>SUV</option>
+                                <option>Hatchback</option>
+                                <option>Coupe</option>
+                                <option>Convertible</option>
+                                <option>Sport</option>
+                                <option>Electric</option>
+                                <option>Truck</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-uppercase">Model Name</label>
+                            <input type="text" class="form-control" id="modelInput" placeholder="e.g. RS7 Sportback" style="height: 56px; border-radius: 12px;">
+                        </div>
+                        <button type="button" class="btn btn-primary btn-block py-3 font-weight-bold" style="border-radius: 16px;" onclick="addCarModel()">Add to List</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div class="modal fade" id="quickViewModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content overflow-hidden" style="border-radius: 32px;">
+                <div class="row no-gutters">
+                    <div class="col-lg-7">
+                        <div class="qv-gallery-container">
+                            <div id="qvMainWrapper" class="qv-main-img-wrapper">
+                                <!-- Main images will be populated here -->
+                            </div>
+                            <div id="qvThumbnails" class="qv-thumbnails">
+                                <!-- Thumbnails will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="modal-header border-0 p-4 justify-content-end">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <div class="close-circle">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="modal-body p-5">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <span class="rating-badge">4.8 ★</span>
+                                <span id="qvPrice" class="car-price"></span>
+                            </div>
+                            <h2 id="qvTitle" style="font-weight: 800; margin-bottom: 1.5rem;"></h2>
+                            <div class="car-location mb-4">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span id="qvLocation"></span>
+                            </div>
+                            <p id="qvDescription" class="text-muted mb-5" style="line-height: 1.8;"></p>
+                            
+                            <div class="car-specs mb-5">
+                                <div class="spec-item"><i class="fas fa-tachometer-alt"></i><span>7 700 km</span></div>
+                                <div class="spec-item"><i class="fas fa-gas-pump"></i><span>Petrol</span></div>
+                                <div class="spec-item"><i class="fas fa-engine"></i><span>390 kW</span></div>
+                                <div class="spec-item"><i class="fas fa-gears"></i><span>4WD</span></div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button class="buy-now-btn py-3" onclick="window.location.href='/dealer/1/'">
+                                    <i class="fas fa-building"></i>
+                                    Visit Dealership
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer bg-white mt-5">
+        <div class="container text-center py-4">
+            <div class="footer-logo mb-0">Cars<span>Dealership</span></div>
+            <p class="text-muted small mt-2">&copy; 2026 Cars Dealership. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global State for Like and Cart
+        let likedCount = parseInt(localStorage.getItem('likedCount')) || 0;
+        let cartCount = parseInt(localStorage.getItem('cartCount')) || 0;
+
+        function updateCounters() {
+            const likedBadges = document.querySelectorAll('.liked-badge');
+            const cartBadges = document.querySelectorAll('.cart-badge');
+            likedBadges.forEach(b => b.innerText = likedCount);
+            cartBadges.forEach(b => b.innerText = cartCount);
+            localStorage.setItem('likedCount', likedCount);
+            localStorage.setItem('cartCount', cartCount);
+        }
+
+        function toggleLike(btn) {
+            btn.classList.toggle('liked');
+            const icon = btn.querySelector('i');
+            if (btn.classList.contains('liked')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                likedCount++;
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                likedCount--;
+            }
+            updateCounters();
+        }
+
+        function addToCart() {
+            cartCount++;
+            updateCounters();
+            alert('Added to cart!');
+        }
+
+        // Authentication Status Logic
+        function updateNavbar() {
+            const authSection = document.getElementById('nav-auth-section');
+            const user = localStorage.getItem('username');
+            const role = localStorage.getItem('userRole');
+            const isDashboard = window.location.pathname.includes('dashboard');
+
+            if (user && user !== "undefined" && user !== "null") {
+                let iconsHtml = '';
+                // Only show Heart/Cart on non-dashboard pages
+                if (!isDashboard) {
+                    iconsHtml = `
+                        <a href="#" class="nav-icon-link" title="Favorites">
+                            <i class="far fa-heart"></i>
+                            <span class="badge badge-pill badge-primary liked-badge">${likedCount}</span>
+                        </a>
+                        <a href="#" class="nav-icon-link" title="Cart">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge badge-pill badge-primary cart-badge">${cartCount}</span>
+                        </a>
+                    `;
+                }
+
+                authSection.innerHTML = `
+                    <div class="nav-icons-group">
+                        ${iconsHtml}
+                        <div class="dropdown">
+                            <a href="#" class="nav-icon-link dropdown-toggle" id="profileDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="far fa-user-circle"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="profileDropdown">
+                                <h6 class="dropdown-header">Hello, ${user}</h6>
+                                <a id="dashboard-link" class="dropdown-item" href="#"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Update dashboard link
+                const dashLink = document.getElementById('dashboard-link');
+                if (role === 'admin') dashLink.href = '/admin-dashboard/';
+                else if (role === 'dealer') dashLink.href = '/dealer-dashboard/';
+                else dashLink.href = '/buyer-dashboard/';
+                
+                updateCounters();
+            } else {
+                authSection.innerHTML = `
+                    <a class="nav-link" href="/login/">Log in</a>
+                    <a class="btn btn-primary ml-lg-3" href="/register/">Sign up</a>
+                `;
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/djangoapp/logout/');
+                localStorage.removeItem('username');
+                window.location.href = '/';
+            } catch (err) {
+                console.error('Logout failed', err);
+                localStorage.removeItem('username');
+                window.location.href = '/';
+            }
+        }
+
+        // Initialize Navbar
+        updateNavbar();
+
+        const brandModels = {
+            'Mercedes-Benz': ['AMG GT', 'A 150', 'Citan', 'E-Class', 'S-Class'],
+            'BMW': ['X7', 'M2', 'iX2', '3 Series', 'M4'],
+            'Audi': ['RS7', 'A4', 'Q5', 'e-tron', 'TT'],
+            'Toyota': ['Camry', 'Corolla', 'RAV4', 'Land Cruiser', 'Supra'],
+            'Volkswagen': ['Golf', 'Passat', 'Tiguan', 'ID.4', 'Polo'],
+            'Subaru': ['Impreza', 'Outback', 'Forester', 'WRX', 'BRZ']
+        };
+
+        const brandIcons = {
+            'Mercedes-Benz': '/static/images/logo/mercedes.png',
+            'BMW': '/static/images/logo/bmw.png',
+            'Audi': '/static/images/logo/audi.jpg',
+            'Toyota': '/static/images/logo/toyota.png',
+            'Volkswagen': '/static/images/logo/volkswagen.png',
+            'Subaru': '/static/images/logo/subaru.png'
+        };
+
+        document.getElementById('newMake').addEventListener('change', function() {
+            const make = this.value;
+            const container = document.getElementById('modelCheckboxes');
+            container.innerHTML = '';
+            brandModels[make].forEach(model => {
+                container.innerHTML += `
+                    <div class="custom-control custom-checkbox mb-2">
+                        <input type="checkbox" class="custom-control-input model-cb" id="m-${model}" value="${model}">
+                        <label class="custom-control-label small font-weight-bold" for="m-${model}">${model}</label>
+                    </div>
+                `;
+            });
+        });
+
+        // Trigger change once to init
+        document.getElementById('newMake').dispatchEvent(new Event('change'));
+
+        function updatePrice(val) {
+            document.getElementById('maxPriceInput').value = parseInt(val).toLocaleString() + ' €';
+            filterCars();
+        }
+
+        function filterType(type, btn) {
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            filterCars();
+        }
+
+        function filterCars() {
+            const maxPrice = parseInt(document.getElementById('priceRange').value);
+            const selectedType = document.querySelector('.type-btn.active span').innerText;
+            const cards = document.querySelectorAll('.car-card');
+            let count = 0;
+
+            cards.forEach(card => {
+                const price = parseInt(card.getAttribute('data-price'));
+                const type = card.getAttribute('data-type');
+                
+                if (price <= maxPrice && (selectedType === 'Sport cars' ? type === 'Sport' : type === selectedType)) {
+                    card.style.display = 'block';
+                    count++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            document.getElementById('car-count').innerText = count;
+        }
+
+        function addNewModel() {
+            const make = document.getElementById('newMake').value;
+            const selectedModels = Array.from(document.querySelectorAll('.model-cb:checked')).map(cb => cb.value);
+            if(selectedModels.length === 0) return;
+
+            const icon = brandIcons[make];
+            const tags = selectedModels.map(m => `<span class="model-tag">${m}</span>`).join('');
+
+            const html = `
+                <div class="input-group mb-2 border rounded-lg p-3 align-items-center">
+                    <img src="${icon}" class="brand-icon" alt="${make}">
+                    <div class="flex-grow-1">
+                        <div class="font-weight-bold small">${make}</div>
+                        <div class="mt-1">${tags}</div>
+                    </div>
+                    <div class="close-circle" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            `;
+            document.getElementById('selected-models').insertAdjacentHTML('beforeend', html);
+            $('#addModelModal').modal('hide');
+        }
+
+        function resetFilters() {
+            document.getElementById('selected-models').innerHTML = '';
+            resetPrice();
+        }
+
+        function resetPrice() {
+            const slider = document.getElementById('priceRange');
+            slider.value = 150000;
+            updatePrice(150000);
+        }
+
+        function showQuickView(title, price, imgs, location, desc) {
+            document.getElementById('qvTitle').innerText = title;
+            document.getElementById('qvPrice').innerText = price;
+            document.getElementById('qvLocation').innerText = location;
+            document.getElementById('qvDescription').innerText = desc;
+            
+            const mainWrapper = document.getElementById('qvMainWrapper');
+            const thumbContainer = document.getElementById('qvThumbnails');
+            
+            // Populate main images for scrolling
+            mainWrapper.innerHTML = '';
+            imgs.forEach((img, idx) => {
+                const imgEl = document.createElement('img');
+                imgEl.src = img;
+                imgEl.id = `qv-img-${idx}`;
+                imgEl.className = 'img-fluid';
+                mainWrapper.appendChild(imgEl);
+            });
+            
+            // Populate thumbnails
+            thumbContainer.innerHTML = '';
+            if (imgs.length > 1) {
+                imgs.forEach((img, idx) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = `thumb-item ${idx === 0 ? 'active' : ''}`;
+                    thumb.innerHTML = `<img src="${img}" alt="Angle ${idx + 1}">`;
+                    thumb.onclick = function() {
+                        const targetImg = document.getElementById(`qv-img-${idx}`);
+                        targetImg.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+                        document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                    };
+                    thumbContainer.appendChild(thumb);
+                });
+                thumbContainer.style.display = 'flex';
+            } else {
+                thumbContainer.style.display = 'none';
+            }
+
+            // Sync thumbnails on scroll
+            mainWrapper.onscroll = function() {
+                const scrollLeft = mainWrapper.scrollLeft;
+                const width = mainWrapper.offsetWidth;
+                const activeIndex = Math.round(scrollLeft / width);
+                const thumbs = document.querySelectorAll('.thumb-item');
+                if (thumbs[activeIndex]) {
+                    thumbs.forEach(t => t.classList.remove('active'));
+                    thumbs[activeIndex].classList.add('active');
+                }
+            };
+            
+            $('#quickViewModal').modal('show');
+        }
+    </script>
+</body>
+</html>

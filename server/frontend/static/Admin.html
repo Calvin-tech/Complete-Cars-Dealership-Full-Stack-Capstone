@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Cars Dealership</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <!-- Consistent Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars<span>Dealership</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+                </ul>
+                <div class="navbar-nav ml-auto align-items-center" id="nav-auth-section">
+                    <span class="text-muted small font-weight-bold mr-3">ADMIN PANEL</span>
+                    <a class="btn btn-outline" href="#" onclick="logout(); return false;">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function updateNavbar() {
+            const authSection = document.getElementById('nav-auth-section');
+            const user = localStorage.getItem('username');
+            const role = localStorage.getItem('userRole');
+            
+            if (user && user !== "undefined" && user !== "null") {
+                authSection.innerHTML = `
+                    <div class="nav-icons-group">
+                        <div class="dropdown">
+                            <a href="#" class="nav-icon-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="far fa-user-circle"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h6 class="dropdown-header">Hello, ${user}</h6>
+                                <a id="dashboard-link" class="dropdown-item" href="#"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                const dashLink = document.getElementById('dashboard-link');
+                if (role === 'admin') dashLink.href = '/admin-dashboard/';
+                else if (role === 'dealer') dashLink.href = '/dealer-dashboard/';
+                else dashLink.href = '/buyer-dashboard/';
+            }
+        }
+        async function logout() {
+            try { await fetch('/djangoapp/logout/'); } catch(e) {}
+            localStorage.removeItem('username');
+            localStorage.removeItem('userRole');
+            window.location.href = '/';
+        }
+        document.addEventListener('DOMContentLoaded', updateNavbar);
+    </script>
+
+    <main class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 style="font-weight: 800;">Management Dashboard</h1>
+                <p class="text-muted">Oversee all dealerships, reviews, and inventory</p>
+            </div>
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline mr-2">Export Data</button>
+                <button class="btn btn-primary" style="background: #FF5C35;">+ Add New Dealer</button>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="row mb-5">
+            <div class="col-md-3">
+                <div class="card p-4">
+                    <h6 class="text-muted small font-weight-bold text-uppercase mb-2">Total Dealers</h6>
+                    <h2 class="font-weight-bold mb-0">124</h2>
+                    <span class="text-success small">↑ 12% this month</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4">
+                    <h6 class="text-muted small font-weight-bold text-uppercase mb-2">Total Reviews</h6>
+                    <h2 class="font-weight-bold mb-0">1,842</h2>
+                    <span class="text-success small">↑ 5% this month</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4">
+                    <h6 class="text-muted small font-weight-bold text-uppercase mb-2">Avg Sentiment</h6>
+                    <h2 class="font-weight-bold mb-0">4.7</h2>
+                    <span class="text-primary small">High Satisfaction</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4">
+                    <h6 class="text-muted small font-weight-bold text-uppercase mb-2">Inventory</h6>
+                    <h2 class="font-weight-bold mb-0">3,120</h2>
+                    <span class="text-muted small">Cars across all dealers</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Table -->
+        <div class="card" style="border-radius: 24px;">
+            <div class="card-body p-0">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="font-weight-bold mb-0">Dealership Management</h5>
+                    <div style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search dealers...">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 px-4 py-3 small font-weight-bold text-muted">DEALER NAME</th>
+                                <th class="border-0 py-3 small font-weight-bold text-muted">LOCATION</th>
+                                <th class="border-0 py-3 small font-weight-bold text-muted">REVIEWS</th>
+                                <th class="border-0 py-3 small font-weight-bold text-muted">STATUS</th>
+                                <th class="border-0 px-4 py-3 small font-weight-bold text-muted">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-4 py-4 font-weight-bold">Kansas Auto Dealership</td>
+                                <td class="py-4">Topeka, KS</td>
+                                <td class="py-4">120 reviews</td>
+                                <td class="py-4"><span class="badge badge-success">Active</span></td>
+                                <td class="px-4 py-4">
+                                    <button class="btn btn-sm btn-outline mr-2">Edit</button>
+                                    <button class="btn btn-sm btn-outline text-danger">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-4 font-weight-bold">New York City Motors</td>
+                                <td class="py-4">New York, NY</td>
+                                <td class="py-4">85 reviews</td>
+                                <td class="py-4"><span class="badge badge-success">Active</span></td>
+                                <td class="px-4 py-4">
+                                    <button class="btn btn-sm btn-outline mr-2">Edit</button>
+                                    <button class="btn btn-sm btn-outline text-danger">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-4 font-weight-bold">California Cars</td>
+                                <td class="py-4">Los Angeles, CA</td>
+                                <td class="py-4">210 reviews</td>
+                                <td class="py-4"><span class="badge badge-info">Featured</span></td>
+                                <td class="px-4 py-4">
+                                    <button class="btn btn-sm btn-outline mr-2">Edit</button>
+                                    <button class="btn btn-sm btn-outline text-danger">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer bg-white mt-5">
+        <div class="container text-center py-4">
+            <div class="footer-logo mb-0">Cars<span>Dealership</span></div>
+            <p class="text-muted small mt-2">&copy; 2026 Cars Dealership. Admin Panel v1.0</p>
+        </div>
+    </footer>
+</body>
+</html>

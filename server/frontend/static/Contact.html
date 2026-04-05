@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Cars Dealership</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars<span>Dealership</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/contact/">Contact</a></li>
+                </ul>
+                <div class="navbar-nav ml-auto align-items-center" id="nav-auth-section">
+                    <a class="nav-link" href="/login/">Log in</a>
+                    <a class="btn btn-primary ml-lg-3" href="/register/">Sign up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function updateNavbar() {
+            const authSection = document.getElementById('nav-auth-section');
+            const user = localStorage.getItem('username');
+            const role = localStorage.getItem('userRole');
+            
+            if (user && user !== "undefined" && user !== "null") {
+                authSection.innerHTML = `
+                    <div class="nav-icons-group">
+                        <a href="#" class="nav-icon-link"><i class="far fa-heart"></i><span class="badge badge-pill badge-primary">2</span></a>
+                        <a href="#" class="nav-icon-link"><i class="fas fa-shopping-cart"></i><span class="badge badge-pill badge-primary">0</span></a>
+                        <div class="dropdown">
+                            <a href="#" class="nav-icon-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="far fa-user-circle"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h6 class="dropdown-header">Hello, ${user}</h6>
+                                <a id="dashboard-link" class="dropdown-item" href="#"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                const dashLink = document.getElementById('dashboard-link');
+                if (role === 'admin') dashLink.href = '/admin-dashboard/';
+                else if (role === 'dealer') dashLink.href = '/dealer-dashboard/';
+                else dashLink.href = '/buyer-dashboard/';
+            }
+        }
+        async function logout() {
+            try { await fetch('/djangoapp/logout/'); } catch(e) {}
+            localStorage.removeItem('username');
+            localStorage.removeItem('userRole');
+            window.location.href = '/';
+        }
+        document.addEventListener('DOMContentLoaded', updateNavbar);
+    </script>
+
+    <main class="container py-5">
+        <div class="row align-items-center" style="min-height: 70vh;">
+            <div class="col-lg-5 mb-5 mb-lg-0">
+                <h1 style="font-weight: 800; font-size: 4rem; margin-bottom: 2rem;">Get in <span class="text-primary">Touch</span></h1>
+                <p class="text-muted mb-5" style="font-size: 1.1rem; line-height: 1.8;">Our premium support team is ready to assist you with any inquiries regarding our national dealership network.</p>
+                
+                <div class="mb-4 d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mr-4" style="width: 56px; height: 56px; font-size: 1.25rem;">
+                        <i class="fas fa-location-dot"></i>
+                    </div>
+                    <div>
+                        <h6 class="font-weight-bold mb-1">Our Headquarters</h6>
+                        <p class="text-muted small mb-0">123 Car Street, Automotive City, NY 10001</p>
+                    </div>
+                </div>
+
+                <div class="mb-4 d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mr-4" style="width: 56px; height: 56px; font-size: 1.25rem;">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                        <h6 class="font-weight-bold mb-1">Phone Number</h6>
+                        <p class="text-muted small mb-0">+1 (555) 123-4567</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mr-4" style="width: 56px; height: 56px; font-size: 1.25rem;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <h6 class="font-weight-bold mb-1">Email Address</h6>
+                        <p class="text-muted small mb-0">support@carsdealership.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-7">
+                <div class="card p-5" style="border-radius: 32px;">
+                    <h3 style="font-weight: 800; margin-bottom: 2.5rem;">Send us a Message</h3>
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="small font-weight-bold text-muted text-uppercase">Full Name</label>
+                                <input type="text" class="form-control" placeholder="John Doe" style="height: 56px;">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="small font-weight-bold text-muted text-uppercase">Email Address</label>
+                                <input type="email" class="form-control" placeholder="john@example.com" style="height: 56px;">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="small font-weight-bold text-muted text-uppercase">Subject</label>
+                            <input type="text" class="form-control" placeholder="How can we help?" style="height: 56px;">
+                        </div>
+                        <div class="mb-5">
+                            <label class="small font-weight-bold text-muted text-uppercase">Message</label>
+                            <textarea class="form-control" rows="5" placeholder="Your message here..." style="padding-top: 1rem;"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block py-3">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer bg-white mt-5">
+        <div class="container text-center py-4">
+            <div class="footer-logo mb-0">Cars<span>Dealership</span></div>
+            <p class="text-muted small mt-2">&copy; 2026 Cars Dealership. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

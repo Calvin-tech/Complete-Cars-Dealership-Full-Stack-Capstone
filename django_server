@@ -1,0 +1,12 @@
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+April 04, 2026 - 23:28:45
+Django version 4.2.7, using settings 'server.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+[04/Apr/2026 23:28:50] "GET / HTTP/1.1" 200 1560
+[04/Apr/2026 23:28:51] "GET /static/style.css HTTP/1.1" 200 345
+[04/Apr/2026 23:29:02] "GET /about HTTP/1.1" 200 2450
+[04/Apr/2026 23:29:15] "GET /contact HTTP/1.1" 200 2100

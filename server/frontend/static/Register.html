@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up | Cars Dealership</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <!-- Consistent Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars<span>Dealership</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+                </ul>
+                <div class="navbar-nav ml-auto">
+                    <a class="btn btn-primary" href="/login/">Log in</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="auth-container">
+            <div class="text-center mb-5">
+                <h2 style="font-weight: 800;">Create Account</h2>
+                <p class="text-muted">Enter your details to create an account</p>
+            </div>
+
+            <!-- Role Selector -->
+            <div class="role-selector" id="roleSelector">
+                <button class="role-btn active" onclick="setRole('buyer', this)">Buyer</button>
+                <button class="role-btn" onclick="setRole('dealer', this)">Dealer</button>
+            </div>
+
+            <form id="registerForm">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="small font-weight-bold text-muted text-uppercase">First Name</label>
+                        <input type="text" id="firstName" class="form-control" placeholder="John" style="height: 56px;" required>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="small font-weight-bold text-muted text-uppercase">Last Name</label>
+                        <input type="text" id="lastName" class="form-control" placeholder="Doe" style="height: 56px;" required>
+                    </div>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="small font-weight-bold text-muted text-uppercase">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="johndoe" style="height: 56px;" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label class="small font-weight-bold text-muted text-uppercase">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="john@example.com" style="height: 56px;" required>
+                </div>
+                <div class="form-group mb-5">
+                    <label class="small font-weight-bold text-muted text-uppercase">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" style="height: 56px;" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block py-3">Create account</button>
+            </form>
+
+            <div id="registerMessage" class="mt-3 small font-weight-bold"></div>
+
+            <div class="text-center mt-5">
+                <p class="text-muted small">Already have an account? <a href="/login/" class="text-primary font-weight-bold">Sign in</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer bg-white mt-5">
+        <div class="container text-center py-4">
+            <div class="footer-logo mb-0">Cars<span>Dealership</span></div>
+            <p class="text-muted small mt-2">&copy; 2026 Cars Dealership. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentRole = 'buyer';
+        function setRole(role, btn) {
+            document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentRole = role;
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('registerMessage');
+            messageDiv.innerText = 'Creating account...';
+            
+            const data = {
+                userName: document.getElementById('username').value,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('/djangoapp/register/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('username', result.userName);
+                    localStorage.setItem('userRole', currentRole);
+                    messageDiv.className = 'mt-3 small font-weight-bold text-success';
+                    messageDiv.innerText = 'Registration successful! Redirecting...';
+                    setTimeout(() => {
+                        let redirectUrl = '/';
+                        if (currentRole === 'dealer') redirectUrl = '/dealer-dashboard/';
+                        else if (currentRole === 'buyer') redirectUrl = '/buyer-dashboard/';
+                        window.location.href = redirectUrl;
+                    }, 1000);
+                } else {
+                    messageDiv.className = 'mt-3 small font-weight-bold text-danger';
+                    messageDiv.innerText = result.error || 'Registration failed';
+                }
+            } catch (err) {
+                messageDiv.className = 'mt-3 small font-weight-bold text-danger';
+                messageDiv.innerText = 'Network error occurred';
+            }
+        });
+    </script>
+</body>
+</html>

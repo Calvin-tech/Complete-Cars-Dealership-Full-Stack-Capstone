@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Review | Cars Dealership</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <!-- Consistent Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars<span>Dealership</span></a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+                </ul>
+                <div class="navbar-nav ml-auto align-items-center" id="nav-auth-section">
+                    <a class="nav-link" href="/login/">Log in</a>
+                    <a class="btn btn-primary ml-lg-3" href="/register/">Sign up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function updateNavbar() {
+            const authSection = document.getElementById('nav-auth-section');
+            const user = localStorage.getItem('username');
+            const role = localStorage.getItem('userRole');
+            
+            if (user && user !== "undefined" && user !== "null") {
+                authSection.innerHTML = `
+                    <div class="nav-icons-group">
+                        <a href="#" class="nav-icon-link"><i class="far fa-heart"></i><span class="badge badge-pill badge-primary">2</span></a>
+                        <a href="#" class="nav-icon-link"><i class="fas fa-shopping-cart"></i><span class="badge badge-pill badge-primary">0</span></a>
+                        <div class="dropdown">
+                            <a href="#" class="nav-icon-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="far fa-user-circle"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h6 class="dropdown-header">Hello, ${user}</h6>
+                                <a id="dashboard-link" class="dropdown-item" href="#"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                const dashLink = document.getElementById('dashboard-link');
+                if (role === 'admin') dashLink.href = '/admin-dashboard/';
+                else if (role === 'dealer') dashLink.href = '/dealer-dashboard/';
+                else dashLink.href = '/buyer-dashboard/';
+            }
+        }
+        async function logout() {
+            try { await fetch('/djangoapp/logout/'); } catch(e) {}
+            localStorage.removeItem('username');
+            localStorage.removeItem('userRole');
+            window.location.href = '/';
+        }
+        document.addEventListener('DOMContentLoaded', updateNavbar);
+    </script>
+
+    <main class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-5" style="border-radius: 32px;">
+                    <div class="mb-5">
+                        <h2 style="font-weight: 800;">Write a Review</h2>
+                        <p class="text-muted">Share your experience with <strong>Kansas Auto Dealership</strong></p>
+                    </div>
+                    
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="small font-weight-bold text-muted text-uppercase">Car Make</label>
+                                <select class="form-control" style="height: 56px;">
+                                    <option>Select Make</option>
+                                    <option>Toyota</option>
+                                    <option>Honda</option>
+                                    <option>Ford</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="small font-weight-bold text-muted text-uppercase">Car Model</label>
+                                <select class="form-control" style="height: 56px;">
+                                    <option>Select Model</option>
+                                    <option>Camry</option>
+                                    <option>Civic</option>
+                                    <option>F-150</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-muted text-uppercase">Purchase Date</label>
+                            <input type="date" class="form-control" style="height: 56px;">
+                        </div>
+                        <div class="form-group mb-4">
+                            <label class="small font-weight-bold text-muted text-uppercase">Your Review</label>
+                            <textarea class="form-control" rows="5" placeholder="What did you think of the service?" style="padding-top: 1rem;"></textarea>
+                        </div>
+                        <div class="custom-control custom-checkbox mb-5">
+                            <input type="checkbox" class="custom-control-input" id="purchaseCheck">
+                            <label class="custom-control-label font-weight-bold small text-muted" for="purchaseCheck">I PURCHASED A CAR FROM THIS DEALER</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary px-5 py-3">Submit Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="small text-muted mb-0">&copy; 2026 Cars Dealership. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

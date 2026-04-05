@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Cars Dealership</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Cars<span>Dealership</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/about/">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
+                </ul>
+                <div class="navbar-nav ml-auto align-items-center" id="nav-auth-section">
+                    <a class="nav-link" href="/login/">Log in</a>
+                    <a class="btn btn-primary ml-lg-3" href="/register/">Sign up</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function updateNavbar() {
+            const authSection = document.getElementById('nav-auth-section');
+            const user = localStorage.getItem('username');
+            const role = localStorage.getItem('userRole');
+            
+            if (user && user !== "undefined" && user !== "null") {
+                authSection.innerHTML = `
+                    <div class="nav-icons-group">
+                        <a href="#" class="nav-icon-link"><i class="far fa-heart"></i><span class="badge badge-pill badge-primary">2</span></a>
+                        <a href="#" class="nav-icon-link"><i class="fas fa-shopping-cart"></i><span class="badge badge-pill badge-primary">0</span></a>
+                        <div class="dropdown">
+                            <a href="#" class="nav-icon-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="far fa-user-circle"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <h6 class="dropdown-header">Hello, ${user}</h6>
+                                <a id="dashboard-link" class="dropdown-item" href="#"><i class="fas fa-th-large mr-2"></i>Dashboard</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-cog mr-2"></i>Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                const dashLink = document.getElementById('dashboard-link');
+                if (role === 'admin') dashLink.href = '/admin-dashboard/';
+                else if (role === 'dealer') dashLink.href = '/dealer-dashboard/';
+                else dashLink.href = '/buyer-dashboard/';
+            }
+        }
+        async function logout() {
+            try { 
+                await fetch('/djangoapp/logout/'); 
+            } catch(e) { console.error("Logout request failed:", e); }
+            localStorage.removeItem('username');
+            localStorage.removeItem('userRole');
+            window.location.href = '/';
+        }
+        document.addEventListener('DOMContentLoaded', updateNavbar);
+    </script>
+
+    <main class="container py-5">
+        <div class="text-center mb-5 pb-5">
+            <h1 style="font-weight: 800; font-size: 4rem; margin-bottom: 1.5rem;">Our Mission</h1>
+            <p class="hero-subtitle">Redefining the car buying journey through transparency, trust, and technology.</p>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-6 mb-4">
+                <div class="card p-5" style="border-radius: 32px;">
+                    <h3 style="font-weight: 800; margin-bottom: 1.5rem;">Who We Are</h3>
+                    <p class="text-muted" style="font-size: 1.1rem; line-height: 1.8;">Cars Dealership is a national leader in the automotive marketplace. We provide a premium platform for customers to find certified dealerships and read authentic reviews from a verified community.</p>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card p-5" style="border-radius: 32px;">
+                    <h3 style="font-weight: 800; margin-bottom: 1.5rem;">Our Values</h3>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3 d-flex align-items-center"><span class="text-primary mr-3" style="font-size: 1.5rem;">✓</span> <span class="font-weight-bold">Transparency in every deal</span></li>
+                        <li class="mb-3 d-flex align-items-center"><span class="text-primary mr-3" style="font-size: 1.5rem;">✓</span> <span class="font-weight-bold">Customer-first mentality</span></li>
+                        <li class="mb-0 d-flex align-items-center"><span class="text-primary mr-3" style="font-size: 1.5rem;">✓</span> <span class="font-weight-bold">Innovation in automotive tech</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-center mb-5" style="font-weight: 800; font-size: 2.5rem;">Our Leadership</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card text-center overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" class="card-img-top" alt="CEO" style="height: 350px;">
+                    <div class="card-body">
+                        <h5 class="font-weight-bold mb-1">John Doe</h5>
+                        <p class="text-primary small font-weight-bold mb-0">CEO & FOUNDER</p>
+                        <p class="text-muted small mt-2">With over 20 years in the auto industry, John leads our strategic vision.</p>
+                        <a href="mailto:john.doe@carsdealership.com" class="small font-weight-bold">john.doe@carsdealership.com</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=400" class="card-img-top" alt="COO" style="height: 350px;">
+                    <div class="card-body">
+                        <h5 class="font-weight-bold mb-1">Jane Smith</h5>
+                        <p class="text-primary small font-weight-bold mb-0">CHIEF OPERATING OFFICER</p>
+                        <p class="text-muted small mt-2">Jane ensures our operations across all 50 states run with peak efficiency.</p>
+                        <a href="mailto:jane.smith@carsdealership.com" class="small font-weight-bold">jane.smith@carsdealership.com</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card text-center overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" class="card-img-top" alt="CTO" style="height: 350px;">
+                    <div class="card-body">
+                        <h5 class="font-weight-bold mb-1">Robert Brown</h5>
+                        <p class="text-primary small font-weight-bold mb-0">CHIEF TECHNOLOGY OFFICER</p>
+                        <p class="text-muted small mt-2">Robert heads our digital innovation team, focusing on AI-driven search.</p>
+                        <a href="mailto:robert.brown@carsdealership.com" class="small font-weight-bold">robert.brown@carsdealership.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer bg-white mt-5">
+        <div class="container text-center py-4">
+            <div class="footer-logo mb-0">Cars<span>Dealership</span></div>
+            <p class="text-muted small mt-2">&copy; 2026 Cars Dealership. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

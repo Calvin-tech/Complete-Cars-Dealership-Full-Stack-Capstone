@@ -1,0 +1,9 @@
+django
+django-cors-headers
+requests
+python-dotenv
+flask
+textblob
+mongoose
+express
+body-parser
