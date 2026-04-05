@@ -12,6 +12,7 @@ const Register = () => {
     });
     const [currentRole, setCurrentRole] = useState('buyer');
     const [message, setMessage] = useState({ text: '', type: '' });
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -23,7 +24,8 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage({ text: 'Creating account...', type: '' });
+        setLoading(true);
+        setMessage({ text: 'Creating account...', type: 'info' });
         
         const dataToSend = {
             userName: formData.username, // Backend might expect 'userName'
@@ -42,7 +44,7 @@ const Register = () => {
 
             const result = await response.json();
             if (response.ok) {
-                localStorage.setItem('username', result.userName);
+                localStorage.setItem('username', result.userName || result.username);
                 localStorage.setItem('userRole', currentRole);
                 setMessage({ text: 'Registration successful! Redirecting...', type: 'success' });
                 setTimeout(() => {
@@ -56,6 +58,8 @@ const Register = () => {
             }
         } catch (err) {
             setMessage({ text: 'Network error occurred', type: 'danger' });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -96,7 +100,9 @@ const Register = () => {
                         <label htmlFor="password" className="small font-weight-bold text-muted text-uppercase">Password</label>
                         <input type="password" id="password" className="form-control" placeholder="••••••••" style={{ height: '56px' }} value={formData.password} onChange={handleChange} required minLength="8" />
                     </div>
-                    <button type="submit" className="btn btn-primary btn-block py-3">Register</button>
+                    <button type="submit" className="btn btn-primary btn-block py-3" disabled={loading}>
+                        {loading ? 'Processing...' : 'Register'}
+                    </button>
                 </form>
 
                 {message.text && <div className={`mt-3 small font-weight-bold text-${message.type}`}>{message.text}</div>}

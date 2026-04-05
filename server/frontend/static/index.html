@@ -461,10 +461,12 @@
             try {
                 const response = await fetch('/djangoapp/logout/');
                 localStorage.removeItem('username');
+                localStorage.removeItem('userRole');
                 window.location.href = '/';
             } catch (err) {
                 console.error('Logout failed', err);
                 localStorage.removeItem('username');
+                localStorage.removeItem('userRole');
                 window.location.href = '/';
             }
         }
