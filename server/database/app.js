@@ -70,6 +70,8 @@ const images = [
 
 let dealers = Array.from({ length: 50 }, (_, i) => {
   const loc = locations[i % locations.length];
+  const short_name = (i === 0) ? "Kansas Dealer 1" : `Dealer ${i + 1}`;
+  const full_name = (i === 0) ? "Kansas Dealership Branch 1" : `${loc.city} Premium Cars #${i + 1}`;
   return {
     "id": i + 1,
     "city": loc.city,
@@ -78,8 +80,8 @@ let dealers = Array.from({ length: 50 }, (_, i) => {
     "zip": loc.zip,
     "lat": loc.lat + (Math.random() * 0.01),
     "long": loc.long + (Math.random() * 0.01),
-    "short_name": `Dealer ${i + 1}`,
-    "full_name": `${loc.city} Premium Cars #${i + 1}`,
+    "short_name": short_name,
+    "full_name": full_name,
     "image": images[i % images.length]
   };
 });
@@ -87,7 +89,7 @@ let dealers = Array.from({ length: 50 }, (_, i) => {
 let reviews = [
   {
     "id": 1,
-    "name": "Berkeley Dealership",
+    "name": "Berkeley Jon",
     "dealership": 1,
     "review": "Great service and friendly staff!",
     "purchase": true,
@@ -101,19 +103,25 @@ let reviews = [
 
 // Endpoints
 app.get('/fetchDealers', (req, res) => {
-  res.json(dealers);
+  const sanitizedDealers = dealers.map(({ st, ...rest }) => rest);
+  res.json(sanitizedDealers);
 });
 
 app.get('/fetchDealersByState/:state', (req, res) => {
   const stateToFind = req.params.state.toLowerCase();
   const filtered = dealers.filter(d => d.state.toLowerCase() === stateToFind);
-  res.json(filtered);
+  const sanitizedDealers = filtered.map(({ st, ...rest }) => rest);
+  res.json(sanitizedDealers);
 });
 
 app.get('/fetchDealer/:id', (req, res) => {
   const dealer = dealers.find(d => d.id == req.params.id);
-  const { st, ...dealerWithoutSt } = dealer;
-  res.json(dealerWithoutSt);
+  if (dealer) {
+    const { st, ...dealerWithoutSt } = dealer;
+    res.json(dealerWithoutSt);
+  } else {
+    res.status(404).json({ message: "Dealer not found" });
+  }
 });
 
 app.get('/fetchReviews/dealer/:id', (req, res) => {

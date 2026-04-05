@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post Review | Cars Dealership</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -74,43 +75,43 @@
             </a>
         </div>
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card p-5" style="border-radius: 32px;">
-                    <div class="mb-5">
-                        <h2 style="font-weight: 800;"><i class="fas fa-edit text-primary mr-3"></i>Write a Review</h2>
-                        <p class="text-muted" id="dealer-name-display">Share your experience with <strong>Dealership</strong></p>
+            <div class="col-md-6">
+                <div class="card p-4" style="border-radius: 24px;">
+                    <div class="mb-4">
+                        <h4 style="font-weight: 800;"><i class="fas fa-edit text-primary mr-2"></i>Write a Review</h4>
+                        <p class="text-muted small" id="dealer-name-display">Share your experience with <strong>Dealership</strong></p>
                     </div>
                     
                     <form id="reviewForm">
                         <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-car mr-2"></i>Car Make</label>
-                                <select class="form-control" id="carMake" style="height: 56px;" required onchange="updateModels()">
+                            <div class="col-md-6 mb-3">
+                                <label class="x-small font-weight-bold text-muted text-uppercase"><i class="fas fa-car mr-1"></i>Car Make</label>
+                                <select class="form-control form-control-sm" id="carMake" style="height: 45px; border-radius: 10px;" required onchange="updateModels()">
                                     <option value="">Select Make</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-4">
-                                <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-list mr-2"></i>Car Model</label>
-                                <select class="form-control" id="carModel" style="height: 56px;" required disabled>
+                            <div class="col-md-6 mb-3">
+                                <label class="x-small font-weight-bold text-muted text-uppercase"><i class="fas fa-list mr-1"></i>Car Model</label>
+                                <select class="form-control form-control-sm" id="carModel" style="height: 45px; border-radius: 10px;" required disabled>
                                     <option value="">Select Model</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group mb-4">
-                            <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-calendar-alt mr-2"></i>Purchase Date</label>
-                            <input type="date" id="purchaseDate" class="form-control" style="height: 56px;" required>
+                        <div class="form-group mb-3">
+                            <label class="x-small font-weight-bold text-muted text-uppercase"><i class="fas fa-calendar-alt mr-1"></i>Purchase Date</label>
+                            <input type="date" id="purchaseDate" class="form-control form-control-sm" style="height: 45px; border-radius: 10px;" required>
                         </div>
-                        <div class="form-group mb-4">
-                            <label class="small font-weight-bold text-muted text-uppercase"><i class="fas fa-comment-dots mr-2"></i>Your Review</label>
-                            <textarea id="reviewText" class="form-control" rows="5" placeholder="What did you think of the service?" style="padding-top: 1rem;" required></textarea>
+                        <div class="form-group mb-3">
+                            <label class="x-small font-weight-bold text-muted text-uppercase"><i class="fas fa-comment-dots mr-1"></i>Your Review</label>
+                            <textarea id="reviewText" class="form-control form-control-sm" rows="3" placeholder="What did you think of the service?" style="padding-top: 0.8rem; border-radius: 10px;" required></textarea>
                         </div>
-                        <div class="custom-control custom-checkbox mb-5">
+                        <div class="custom-control custom-checkbox mb-4">
                             <input type="checkbox" class="custom-control-input" id="purchaseCheck">
-                            <label class="custom-control-label font-weight-bold small text-muted" for="purchaseCheck"><i class="fas fa-check-circle mr-2"></i>I PURCHASED A CAR FROM THIS DEALER</label>
+                            <label class="custom-control-label font-weight-bold x-small text-muted" for="purchaseCheck"><i class="fas fa-check-circle mr-1"></i>I PURCHASED A CAR FROM THIS DEALER</label>
                         </div>
-                        <button type="submit" class="btn btn-primary px-5 py-3 font-weight-bold rounded-pill"><i class="fas fa-paper-plane mr-2"></i>Submit Review</button>
+                        <button type="submit" class="btn btn-primary px-4 py-2 font-weight-bold rounded-pill" style="font-size: 0.9rem;"><i class="fas fa-paper-plane mr-2"></i>Submit Review</button>
                     </form>
-                    <div id="submitMessage" class="mt-3 small font-weight-bold"></div>
+                    <div id="submitMessage" class="mt-2 x-small font-weight-bold"></div>
                 </div>
             </div>
         </div>
@@ -142,7 +143,7 @@
 
             // Fetch Dealer Name
             try {
-                const res = await fetch(`/djangoapp/dealer/${dealerId}`);
+                const res = await fetch(`/djangoapp/fetchDealer/${dealerId}/`);
                 const dealer = await res.json();
                 if (dealer) {
                     document.getElementById('dealer-name-display').innerHTML = `Share your experience with <strong>${dealer.full_name}</strong>`;
@@ -151,17 +152,18 @@
 
             // Fetch Car Makes and Models
             try {
-                const res = await fetch('/djangoapp/get_cars');
-                carData = await res.json();
+                const res = await fetch('/djangoapp/get_cars/');
+                const result = await res.json();
+                carData = result.CarModels || [];
                 const makeSelect = document.getElementById('carMake');
-                const uniqueMakes = [...new Set(carData.map(c => c.make))];
+                const uniqueMakes = [...new Set(carData.map(c => c.CarMake))];
                 uniqueMakes.forEach(make => {
                     const opt = document.createElement('option');
                     opt.value = make;
                     opt.innerText = make;
                     makeSelect.appendChild(opt);
                 });
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Error fetching cars:", e); }
         }
 
         function updateModels() {
@@ -174,11 +176,11 @@
                 return;
             }
 
-            const models = carData.filter(c => c.make === make);
+            const models = carData.filter(c => c.CarMake === make);
             models.forEach(m => {
                 const opt = document.createElement('option');
-                opt.value = m.model;
-                opt.innerText = m.model;
+                opt.value = m.CarModel;
+                opt.innerText = m.CarModel;
                 modelSelect.appendChild(opt);
             });
             modelSelect.disabled = false;
@@ -190,17 +192,19 @@
             messageDiv.innerText = 'Submitting review...';
             messageDiv.className = 'mt-3 small font-weight-bold text-primary';
 
-            const selectedModel = carData.find(c => c.model === document.getElementById('carModel').value && c.make === document.getElementById('carMake').value);
+            const carModelValue = document.getElementById('carModel').value;
+            const carMakeValue = document.getElementById('carMake').value;
+            const selectedModel = carData.find(c => c.CarModel === carModelValue && c.CarMake === carMakeValue);
 
             const data = {
-                "name": localStorage.getItem('username'),
+                "name": localStorage.getItem('username') || "Anonymous",
                 "dealership": parseInt(dealerId),
                 "review": document.getElementById('reviewText').value,
                 "purchase": document.getElementById('purchaseCheck').checked,
                 "purchase_date": document.getElementById('purchaseDate').value,
-                "car_make": document.getElementById('carMake').value,
-                "car_model": document.getElementById('carModel').value,
-                "car_year": selectedModel ? selectedModel.year : 2024
+                "car_make": carMakeValue,
+                "car_model": carModelValue,
+                "car_year": selectedModel ? selectedModel.CarYear : 2024
             };
 
             try {
@@ -222,10 +226,10 @@
                     }, 1500);
                 } else {
                     messageDiv.className = 'mt-3 small font-weight-bold text-danger';
-                    messageDiv.innerText = 'Failed to post review: ' + (result.message || 'Unknown error');
+                    messageDiv.innerText = 'Failed to post review: ' + (result.message || 'Error ' + result.status);
                 }
             } catch (err) {
-                console.error(err);
+                console.error("Post review error:", err);
                 messageDiv.className = 'mt-3 small font-weight-bold text-danger';
                 messageDiv.innerText = 'Network error occurred.';
             }

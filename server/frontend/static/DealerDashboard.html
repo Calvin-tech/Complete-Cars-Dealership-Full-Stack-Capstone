@@ -208,19 +208,55 @@
         </main>
     </div>
 
+    <!-- Welcome Modal -->
+    <div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content text-center p-5" style="border-radius: 32px; border: none; box-shadow: 0 24px 48px rgba(0,0,0,0.15);">
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary-light rounded-circle" style="width: 80px; height: 80px; background: rgba(255, 92, 53, 0.1);">
+                            <i class="fas fa-user-check text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                    <h2 style="font-weight: 800; margin-bottom: 1rem;">Welcome, <span id="welcomeModalUserName" class="text-primary"></span>!</h2>
+                    <p class="text-muted" style="font-size: 1.1rem; line-height: 1.6;">You have successfully signed in to your account. Explore our premium dealership network and find your dream car today.</p>
+                    <button type="button" class="btn btn-primary btn-block py-3 mt-4" data-dismiss="modal" style="border-radius: 16px; font-weight: 700; font-size: 1.1rem;">Get Started</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const user = localStorage.getItem('username');
-            if(user) document.getElementById('sidebar-username').innerText = user;
+            const isFirstLogin = localStorage.getItem('firstLogin');
+            if(user) {
+                document.getElementById('sidebar-username').innerText = user;
+                
+                if (isFirstLogin === 'true') {
+                    const welcomeModalUser = document.getElementById('welcomeModalUserName');
+                    if (welcomeModalUser) welcomeModalUser.innerText = user;
+                    $('#welcomeModal').modal('show');
+                    localStorage.removeItem('firstLogin');
+                }
+            }
         });
 
         async function logout() {
-            try { await fetch('/djangoapp/logout/'); } catch(e) {}
-            localStorage.removeItem('username');
-            localStorage.removeItem('userRole');
-            window.location.href = '/';
+            try {
+                await fetch('/djangoapp/logout/');
+                localStorage.removeItem('username');
+                localStorage.removeItem('userRole');
+                localStorage.setItem('loggedOut', 'true');
+                window.location.href = '/';
+            } catch(e) {
+                localStorage.removeItem('username');
+                localStorage.removeItem('userRole');
+                localStorage.setItem('loggedOut', 'true');
+                window.location.href = '/';
+            }
         }
     </script>
 </body>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dealer Details | Cars Dealership</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -38,8 +39,7 @@
             if (user && user !== "undefined" && user !== "null") {
                 authSection.innerHTML = `
                     <div class="nav-icons-group">
-                        <a href="#" class="nav-icon-link"><i class="far fa-heart"></i><span class="badge badge-pill badge-primary">2</span></a>
-                        <a href="#" class="nav-icon-link"><i class="fas fa-shopping-cart"></i><span class="badge badge-pill badge-primary">0</span></a>
+                        <span class="text-muted small font-weight-bold mr-3" style="letter-spacing: 0.5px;">${(role === 'admin') ? 'root user' : (role === 'buyer' ? 'user_buyer' : user)}</span>
                         <div class="dropdown">
                             <a href="#" class="nav-icon-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="far fa-user-circle"></i>
@@ -61,10 +61,18 @@
             }
         }
         async function logout() {
-            try { await fetch('/djangoapp/logout/'); } catch(e) {}
-            localStorage.removeItem('username');
-            localStorage.removeItem('userRole');
-            window.location.href = '/';
+            try {
+                await fetch('/djangoapp/logout/');
+                localStorage.removeItem('username');
+                localStorage.removeItem('userRole');
+                localStorage.setItem('loggedOut', 'true');
+                window.location.href = '/';
+            } catch(e) {
+                localStorage.removeItem('username');
+                localStorage.removeItem('userRole');
+                localStorage.setItem('loggedOut', 'true');
+                window.location.href = '/';
+            }
         }
         document.addEventListener('DOMContentLoaded', updateNavbar);
     </script>
@@ -92,7 +100,7 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card p-4" style="border-radius: 24px;">
+                <div class="card p-4 border-0 shadow-sm" style="border-radius: 24px;">
                     <h5 class="font-weight-bold mb-4">Business Hours</h5>
                     <ul class="list-unstyled mb-0">
                         <li class="d-flex justify-content-between mb-3"><span>Monday</span><span class="text-muted font-weight-bold">9:00 - 18:00</span></li>
@@ -131,81 +139,88 @@
 
             try {
                 // Fetch Dealer Details
-                const dealerRes = await fetch(`/djangoapp/dealer/${dealerId}/?t=${new Date().getTime()}`);
+                const dealerRes = await fetch(`/djangoapp/fetchDealer/${dealerId}/?t=${new Date().getTime()}`);
                 const dealer = await dealerRes.json();
                 
-                if (dealer) {
+                if (dealer && !dealer.message) {
                     const detailsContainer = document.getElementById('dealer-details-container');
                     detailsContainer.innerHTML = `
                         <div class="card mb-5 overflow-hidden" style="border-radius: 32px;">
                             <div class="row no-gutters">
-                                <div class="col-md-6">
+                                <div class="col-md-5">
                                     <img src="${dealer.image || '/static/images/Dealerships/young-couple-talking-sales-person-car-showroom.jpg'}" class="img-fluid h-100" style="object-fit: cover;" alt="${dealer.full_name}">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-7">
                                     <div class="card-body p-lg-5">
-                                        <div class="d-flex justify-content-between align-items-center mb-4">
-                                            <span class="rating-badge">4.8 ★</span>
-                                            <span class="text-muted small font-weight-bold">VERIFIED REVIEWS</span>
-                                        </div>
-                                        <h1 style="font-weight: 800; font-size: 3rem; margin-bottom: 1.5rem;">${dealer.full_name}</h1>
-                                        <p class="text-muted mb-5" style="font-size: 1.1rem;">Premium certified pre-owned vehicles with a focus on transparency and long-term customer satisfaction in ${dealer.city}.</p>
+                                        <h1 style="font-weight: 800; font-size: 2.2rem; margin-bottom: 1rem;">${dealer.full_name}</h1>
+                                        <p class="text-muted mb-4" style="font-size: 1rem;">Premium certified vehicles in ${dealer.city}.</p>
                                         
-                                        <div class="row mb-5">
+                                        <div class="row mb-4">
                                             <div class="col-6">
-                                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Location</h6>
-                                                <p class="font-weight-bold mb-0">${dealer.address}<br>${dealer.city}, ${dealer.st} ${dealer.zip}</p>
+                                                <h6 class="small font-weight-bold text-muted text-uppercase mb-1">Location</h6>
+                                                <p class="font-weight-bold mb-0 small">${dealer.address}<br>${dealer.city}, ${dealer.state || dealer.st} ${dealer.zip}</p>
                                             </div>
                                             <div class="col-6">
-                                                <h6 class="small font-weight-bold text-muted text-uppercase mb-2">Contact</h6>
-                                                <p class="font-weight-bold mb-0">${dealer.short_name.toLowerCase().replace(' ', '.')}@dealership.com<br>+1 (555) 123-4567</p>
+                                                <h6 class="small font-weight-bold text-muted text-uppercase mb-1">Contact</h6>
+                                                <p class="font-weight-bold mb-0 small">${dealer.short_name ? dealer.short_name.toLowerCase().replace(' ', '.') : 'info'}@dealership.com<br>+1 (555) 123-4567</p>
                                             </div>
                                         </div>
                                         
                                         <div class="d-flex">
-                                            ${localStorage.getItem('username') ? `<a href="/post-review/${dealer.id}/" class="btn btn-primary px-5" style="background: #FF5C35;">Write a Review</a>` : ''}
-                                            <a href="/contact/" class="btn btn-outline ml-3">Contact Dealer</a>
+                                            ${localStorage.getItem('username') ? `<a href="/post-review/${dealer.id}/" class="btn btn-primary px-4 py-2" style="background: #FF5C35; font-size: 0.9rem; font-weight: 700; border-radius: 12px;">Add Review</a>` : ''}
+                                            <a href="/" class="btn btn-outline ml-3 px-4 py-2" style="font-size: 0.9rem; font-weight: 700; border-radius: 12px;">View Dealership</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     `;
-                }
 
-                // Fetch Reviews
-                const reviewsRes = await fetch(`/djangoapp/get_reviews/${dealerId}/?t=${new Date().getTime()}`);
-                const reviews = await reviewsRes.json();
-                const reviewsList = document.getElementById('reviews-list');
-                
-                if (reviews && reviews.length > 0) {
-                    reviewsList.innerHTML = '';
-                    reviews.forEach(review => {
-                        const sentimentClass = review.sentiment === 'positive' ? 'badge-success' : (review.sentiment === 'negative' ? 'badge-danger' : 'badge-warning');
-                        reviewsList.innerHTML += `
-                            <div class="card mb-4 p-2">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded-circle mr-3" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #FF5C35;">${review.name.substring(0,2).toUpperCase()}</div>
-                                            <div>
-                                                <h6 class="font-weight-bold mb-0">${review.name}</h6>
-                                                <span class="text-muted small">${review.purchase_date}</span>
+                    // Fetch Reviews
+                    const reviewsRes = await fetch(`/djangoapp/fetchReviews/dealer/${dealerId}/?t=${new Date().getTime()}`);
+                    const reviews = await reviewsRes.json();
+                    const reviewsList = document.getElementById('reviews-list');
+                    
+                    if (reviews && reviews.length > 0) {
+                        reviewsList.innerHTML = '';
+                        for (const review of reviews) {
+                            // Fetch sentiment
+                            let sentiment = 'neutral';
+                            try {
+                                const sentimentRes = await fetch(`/djangoapp/analyze/${encodeURIComponent(review.review)}`);
+                                const sentimentData = await sentimentRes.json();
+                                sentiment = (sentimentData.sentiment || 'neutral').toLowerCase();
+                            } catch (sErr) { console.error(sErr); }
+
+                            const sentimentClass = sentiment === 'positive' ? 'badge-success' : (sentiment === 'negative' ? 'badge-danger' : 'badge-warning');
+                            
+                            reviewsList.innerHTML += `
+                                <div class="card mb-4 p-2 border-0 shadow-sm" style="border-radius: 24px;">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded-circle mr-3" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #FF5C35;">${review.name.substring(0,2).toUpperCase()}</div>
+                                                <div>
+                                                    <h6 class="font-weight-bold mb-0">${review.name}</h6>
+                                                    <span class="text-muted small">${review.purchase_date}</span>
+                                                </div>
                                             </div>
+                                            <span class="badge ${sentimentClass} p-2 px-3" style="border-radius: 8px;">${sentiment.toUpperCase()}</span>
                                         </div>
-                                        <span class="badge ${sentimentClass}">${review.sentiment.toUpperCase()}</span>
-                                    </div>
-                                    <p class="mb-4" style="font-size: 1.05rem;">"${review.review}"</p>
-                                    <div class="bg-light px-3 py-2 rounded-lg d-inline-block">
-                                        <span class="small font-weight-bold text-muted">PURCHASED:</span>
-                                        <span class="small font-weight-bold ml-2">${review.car_make} ${review.car_model} (${review.car_year})</span>
+                                        <p class="mb-4" style="font-size: 1.05rem; line-height: 1.6;">"${review.review}"</p>
+                                        <div class="bg-light px-3 py-2 rounded-lg d-inline-block">
+                                            <span class="small font-weight-bold text-muted text-uppercase" style="letter-spacing: 1px;">Purchased:</span>
+                                            <span class="small font-weight-bold ml-2 text-primary">${review.car_make} ${review.car_model} (${review.car_year})</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        `;
-                    });
+                            `;
+                        }
+                    } else {
+                        reviewsList.innerHTML = '<p class="text-muted">No reviews yet for this dealership.</p>';
+                    }
                 } else {
-                    reviewsList.innerHTML = '<p class="text-muted">No reviews yet for this dealership.</p>';
+                    document.getElementById('dealer-details-container').innerHTML = '<div class="alert alert-warning">Dealership not found.</div>';
                 }
 
             } catch (err) {

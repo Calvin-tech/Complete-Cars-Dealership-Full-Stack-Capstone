@@ -17,6 +17,14 @@ logger = logging.getLogger(__name__)
 
 from django.views.decorators.csrf import csrf_exempt
 
+# Create an `about` view to render the about page
+def about(request):
+    return render(request, "About.html")
+
+# Create a `contact` view to render the contact page
+def contact(request):
+    return render(request, "Contact.html")
+
 # Create a `logout_request` view to handle HTTP GET request
 def logout_request(request):
     logout(request)
@@ -74,9 +82,6 @@ def get_dealer_reviews(request, dealer_id):
     if dealer_id:
         endpoint = "fetchReviews/dealer/" + str(dealer_id)
         reviews = get_request(endpoint)
-        for review in reviews:
-            response = analyze_review_sentiment(review['review'])
-            review['sentiment'] = response['sentiment']
         return JsonResponse(reviews, safe=False)
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
@@ -97,8 +102,8 @@ def add_review(request):
         if not request.user.is_anonymous:
             try:
                 data = json.loads(request.body)
-                post_request(data)
-                return JsonResponse({"status": 200})
+                response = post_request(data)
+                return JsonResponse(response)
             except Exception as e:
                 return JsonResponse({"status": 401, "message": "Error in posting review: " + str(e)})
         else:
@@ -113,10 +118,15 @@ def get_cars(request):
     car_models = CarModel.objects.select_related('car_make')
     cars = []
     for car_model in car_models:
-        cars.append({"CarMake": car_model.car_make.name, "CarModel": car_model.name})
+        cars.append({
+            "CarMake": car_model.car_make.name,
+            "CarModel": car_model.name,
+            "CarType": car_model.type,
+            "CarYear": car_model.year
+        })
     return JsonResponse({"CarModels": cars})
 
 # Create a `analyze_review` view to handle sentiment analysis
 def analyze_review(request, review_text):
-    sentiment = analyze_review_sentiment(review_text)
-    return JsonResponse({"sentiment": sentiment})
+    response = analyze_review_sentiment(review_text)
+    return JsonResponse(response)

@@ -1,5 +1,7 @@
 # fullstack_developer_capstone
 
+Project Name: fullstack_developer_capstone
+
 ## Project Overview
 This is the final project for the Full-stack development Capstone...
 

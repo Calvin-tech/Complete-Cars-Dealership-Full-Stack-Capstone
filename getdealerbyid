@@ -1,15 +1,14 @@
-curl -X GET http://127.0.0.1:8000/djangoapp/dealer/1
+curl -X GET http://127.0.0.1:8000/djangoapp/fetchDealer/1
 
 Output:
 {
   "id": 1,
   "city": "Topeka",
   "state": "Kansas",
-  "st": "KS",
-  "address": "45 Sunflower Lane",
+  "address": "100 Main St",
   "zip": "66601",
   "lat": 39.0473,
   "long": -95.6752,
-  "short_name": "Kansas Auto",
-  "full_name": "Kansas Auto Dealership"
+  "short_name": "Dealer 1",
+  "full_name": "Topeka Premium Cars #1"
 }

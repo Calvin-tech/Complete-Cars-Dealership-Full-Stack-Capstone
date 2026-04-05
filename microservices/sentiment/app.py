@@ -16,8 +16,7 @@ def analyze_sentiment(text):
         sentiment = "neutral"
         
     return jsonify({
-        "sentiment": sentiment,
-        "score": polarity
+        "sentiment": sentiment
     })
 
 if __name__ == '__main__':

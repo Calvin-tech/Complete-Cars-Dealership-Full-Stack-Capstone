@@ -2,6 +2,5 @@ curl -X GET http://127.0.0.1:8000/djangoapp/analyze/Fantastic%20services
 
 Output:
 {
-  "sentiment": "positive",
-  "score": 0.95
+  "sentiment": "positive"
 }
